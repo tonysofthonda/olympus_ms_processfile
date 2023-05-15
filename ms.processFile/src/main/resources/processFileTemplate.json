@@ -1,0 +1,158 @@
+{
+  "template": [
+    {
+      "field": "GM-ORD-REQ-ACTION",
+      "Spaces": 6,
+      "Position_start": 1,
+      "Position_end": 6,
+      "Description": "Request action"
+    },
+    {
+      "field": "GM-ORD-REQ-VEH-ORD-NO",
+      "Spaces": 6,
+      "Position_start": 7,
+      "Position_end": 12,
+      "Description": "Order number"
+    },
+    {
+      "field": "GM-ORD-REQ-MDL-YR",
+      "Spaces": 4,
+      "Position_start": 13,
+      "Position_end": 16,
+      "Description": "Año del modelo"
+    },
+    {
+      "field": "GM-ORD-REQ-SELLING-SRC-CD",
+      "Spaces": 2,
+      "Position_start": 17,
+      "Position_end": 18,
+      "Description": "Ventas SRC CD"
+    },
+    {
+      "field": "GM-ORD-REQ-ORIGIN-TYPE",
+      "Spaces": 8,
+      "Position_start": 19,
+      "Position_end": 26,
+      "Description": "Tipo de Origen"
+    },
+    {
+      "field": "GM-ORD-REQ-EXTERN-CONFIG-CD",
+      "Spaces": 32,
+      "Position_start": 27,
+      "Position_end": 58,
+      "Description": "Config ID externo"
+    },
+    {
+      "field": "GM-ORD-REQ-ORD-TYP-CD",
+      "Spaces": 3,
+      "Position_start": 59,
+      "Position_end": 61,
+      "Description": "Tipo de Orden"
+    },
+    {
+      "field": "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD",
+      "Spaces": 11,
+      "Position_start": 62,
+      "Position_end": 72,
+      "Description": "chrg BuSNS asct CD"
+    },
+    {
+      "field": "GM-ORD-REQ-CHRG-BUSNS-FCN-CD",
+      "Spaces": 5,
+      "Position_start": 73,
+      "Position_end": 77,
+      "Description": "chrg BuSNS asct CD"
+    },
+    {
+      "field": "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD",
+      "Spaces": 11,
+      "Position_start": 78,
+      "Position_end": 88,
+      "Description": "envío Busns fcn CD"
+    },
+    {
+      "field": "GM-ORD-REQ-CHRG-BUSNS-FCN-CD",
+      "Spaces": 5,
+      "Position_start": 89,
+      "Position_end": 93,
+      "Description": "envío Busns fcn CD"
+    },
+    {
+      "field": "GM-ORD-REQ-REQST-ID",
+      "Spaces": 20,
+      "Position_start": 94,
+      "Position_end": 113,
+      "Description": "Order request ID"
+    },
+    {
+      "field": "XPROD-DIV-CD",
+      "Spaces": 1,
+      "Position_start": 114,
+      "Position_end": 114,
+      "Description": "div cd"
+    },
+    {
+      "field": "PLANT-ID",
+      "Spaces": 1,
+      "Position_start": 115,
+      "Position_end": 115,
+      "Description": "ID de planta"
+    },
+    {
+      "field": "GM-PROD-WEEK-START-DAY",
+      "Spaces": 10,
+      "Position_start": 116,
+      "Position_end": 125,
+      "Description": "Día inicio producción"
+    },
+    {
+      "field": "GM-ORD-DUE-DT",
+      "Spaces": 10,
+      "Position_start": 126,
+      "Position_end": 135,
+      "Description": "Fecha final de orden"
+    },
+    {
+      "field": "MDL-ID",
+      "Spaces": 10,
+      "Position_start": 136,
+      "Position_end": 145,
+      "Description": "Model ID"
+    },
+    {
+      "field": "MDL-TYP-CD",
+      "Spaces": 4,
+      "Position_start": 146,
+      "Position_end": 149,
+      "Description": "Model type ID"
+    },
+    {
+      "field": "MDL-OPT-PKG-CD",
+      "Spaces": 3,
+      "Position_start": 150,
+      "Position_end": 152,
+      "Description": "PKG cd"
+    },
+    {
+      "field": "MDL-MFG-COLOR-ID",
+      "Spaces": 11,
+      "Position_start": 153,
+      "Position_end": 163,
+      "Description": "Color ID"
+    },
+    {
+      "field": "EXTR-COLOR-CD",
+      "Spaces": 2,
+      "Position_start": 164,
+      "Position_end": 165,
+      "Description": "Color Exterior"
+    },
+    {
+      "field": "INT-COLOR-CD",
+      "Spaces": 2,
+      "Position_start": 166,
+      "Position_end": 167,
+      "Description": "Color Interior"
+    }
+  ]
+}

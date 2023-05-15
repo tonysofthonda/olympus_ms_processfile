@@ -14,26 +14,24 @@ import com.honda.olympus.vo.MessageVO;
 import com.honda.olympus.vo.ResponseVO;
 
 @Service
-public class NotificationService {
-
-	@Value("${notification.service.url}")
+public class LogEventService {
+	@Value("${logevent.service.url}")
 	private String notificationURI;
-	
-	public void generatesNotification(MessageVO message) throws JsonMappingException, JsonProcessingException{
+
+	public void generatesLogEvent(MessageVO message) throws JsonMappingException, JsonProcessingException {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		RestTemplate restTemplate = new RestTemplate();
-		
-		message = new MessageVO("1", "File Processed", "fileName.txt");
-		
+
 		HttpEntity<MessageVO> requestEntity = new HttpEntity<>(message, headers);
 
-		ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity, ResponseVO.class);
+		ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
+				ResponseVO.class);
 
-		System.out.println("Status Code: " + responseEntity.getStatusCode());	
-		System.out.println("Message: " + responseEntity.getBody().getMessage());		
+		System.out.println("Status Code: " + responseEntity.getStatusCode());
+		System.out.println("Message: " + responseEntity.getBody().getMessage());
 		System.out.println("Location: " + responseEntity.getHeaders().getLocation());
-		
+
 	}
-	
 }
+

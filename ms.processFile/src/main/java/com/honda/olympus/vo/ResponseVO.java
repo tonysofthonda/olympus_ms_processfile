@@ -1,18 +1,13 @@
 package com.honda.olympus.vo;
 
+import java.util.List;
+
 public class ResponseVO {
 
 	private String message;
+	private List<String> details;
 
-	private String details;
-	
-	
-
-	public ResponseVO() {
-		super();
-	}
-
-	public ResponseVO(String message, String details) {
+	public ResponseVO(String message, List<String> details) {
 		super();
 		this.message = message;
 		this.details = details;
@@ -26,11 +21,11 @@ public class ResponseVO {
 		this.message = message;
 	}
 
-	public String getDetails() {
+	public List<String> getDetails() {
 		return details;
 	}
 
-	public void setDetails(String details) {
+	public void setDetails(List<String> details) {
 		this.details = details;
 	}
 

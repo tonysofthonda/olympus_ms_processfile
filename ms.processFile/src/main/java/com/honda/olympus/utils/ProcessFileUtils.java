@@ -104,7 +104,7 @@ public class ProcessFileUtils {
 				String fieldName = obj.getString("field");
 				String value = line.substring(start-1, end);
 
-				fileValues.add(new TemplateFieldVO(fieldName, value, lineNumber));
+				fileValues.add(new TemplateFieldVO(fieldName, value, line));
 
 			});
 

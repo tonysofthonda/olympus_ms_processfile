@@ -4,9 +4,9 @@ public class TemplateFieldVO {
 
 	public String fieldName;
 	public String value;
-	public Integer lineNumber;
+	public String lineNumber;
 
-	public TemplateFieldVO(String fieldName, String value, Integer lineNumber) {
+	public TemplateFieldVO(String fieldName, String value, String lineNumber) {
 		super();
 		this.fieldName = fieldName;
 		this.value = value;
@@ -29,11 +29,11 @@ public class TemplateFieldVO {
 		this.value = value;
 	}
 
-	public Integer getLineNumber() {
+	public String getLineNumber() {
 		return lineNumber;
 	}
 
-	public void setLineNumber(Integer lineNumber) {
+	public void setLineNumber(String lineNumber) {
 		this.lineNumber = lineNumber;
 	}
 

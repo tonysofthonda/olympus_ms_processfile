@@ -8,9 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.honda.olympus.vo.MessageVO;
+import com.honda.olympus.vo.EventVO;
 import com.honda.olympus.vo.ResponseVO;
 
 @Service
@@ -18,12 +16,12 @@ public class LogEventService {
 	@Value("${logevent.service.url}")
 	private String notificationURI;
 
-	public void generatesLogEvent(MessageVO message) throws JsonMappingException, JsonProcessingException {
+	public void sendLogEvent(EventVO message) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		RestTemplate restTemplate = new RestTemplate();
 
-		HttpEntity<MessageVO> requestEntity = new HttpEntity<>(message, headers);
+		HttpEntity<EventVO> requestEntity = new HttpEntity<>(message, headers);
 
 		ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
 				ResponseVO.class);

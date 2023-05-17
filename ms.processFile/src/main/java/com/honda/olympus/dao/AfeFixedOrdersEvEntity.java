@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "afe_fixed_orders_ev", schema= "afedb")
+@Table(name = "afe_fixed_orders_ev", schema = "afedb")
 public class AfeFixedOrdersEvEntity {
 
 	@Id
@@ -17,14 +17,14 @@ public class AfeFixedOrdersEvEntity {
 	private Long id;
 
 	@Column(name = "envio_flag")
-	private String envioFlag;
+	private Boolean envioFlag;
 
 	@Column(name = "order_number")
 	private String orderNumber;
 
 	@Column(name = "selling_code")
 	private String sellingCode;
-	
+
 	@Column(name = "origin_type")
 	private String originType;
 
@@ -40,11 +40,14 @@ public class AfeFixedOrdersEvEntity {
 	@Column(name = "chrg_fcm")
 	private String chrgFcm;
 
+	@Column(name = "ship_sct")
+	private String shipSct;
+
 	@Column(name = "ship_fcm")
 	private String shipFcm;
 
 	@Column(name = "request_id")
-	private String requestId;
+	private Long requestId;
 
 	@Column(name = "start_day")
 	private String startDay;
@@ -59,35 +62,12 @@ public class AfeFixedOrdersEvEntity {
 	private String statusEvId;
 
 	@Column(name = "action_id")
-	private String actionId;
+	private Long actionId;
 
 	@Column(name = "model_color_id")
-	private String modelColorId;
+	private Long modelColorId;
 
 	public AfeFixedOrdersEvEntity() {
-	}
-
-	public AfeFixedOrdersEvEntity(Long id, String envioFlag, String orderNumber, String sellingCode, String originType,
-			String externConfigId, String orderType, String chrgAsct, String chrgFcm, String shipFcm, String requestId,
-			String startDay, String dueDate, String ackId, String statusEvId, String actionId, String modelColorId) {
-		super();
-		this.id = id;
-		this.envioFlag = envioFlag;
-		this.orderNumber = orderNumber;
-		this.sellingCode = sellingCode;
-		this.originType = originType;
-		this.externConfigId = externConfigId;
-		this.orderType = orderType;
-		this.chrgAsct = chrgAsct;
-		this.chrgFcm = chrgFcm;
-		this.shipFcm = shipFcm;
-		this.requestId = requestId;
-		this.startDay = startDay;
-		this.dueDate = dueDate;
-		this.ackId = ackId;
-		this.statusEvId = statusEvId;
-		this.actionId = actionId;
-		this.modelColorId = modelColorId;
 	}
 
 	public Long getId() {
@@ -98,11 +78,11 @@ public class AfeFixedOrdersEvEntity {
 		this.id = id;
 	}
 
-	public String getEnvioFlag() {
+	public Boolean getEnvioFlag() {
 		return envioFlag;
 	}
 
-	public void setEnvioFlag(String envioFlag) {
+	public void setEnvioFlag(Boolean envioFlag) {
 		this.envioFlag = envioFlag;
 	}
 
@@ -162,6 +142,14 @@ public class AfeFixedOrdersEvEntity {
 		this.chrgFcm = chrgFcm;
 	}
 
+	public String getShipSct() {
+		return shipSct;
+	}
+
+	public void setShipSct(String shipSct) {
+		this.shipSct = shipSct;
+	}
+
 	public String getShipFcm() {
 		return shipFcm;
 	}
@@ -170,11 +158,11 @@ public class AfeFixedOrdersEvEntity {
 		this.shipFcm = shipFcm;
 	}
 
-	public String getRequestId() {
+	public Long getRequestId() {
 		return requestId;
 	}
 
-	public void setRequestId(String requestId) {
+	public void setRequestId(Long requestId) {
 		this.requestId = requestId;
 	}
 
@@ -210,19 +198,19 @@ public class AfeFixedOrdersEvEntity {
 		this.statusEvId = statusEvId;
 	}
 
-	public String getActionId() {
+	public Long getActionId() {
 		return actionId;
 	}
 
-	public void setActionId(String actionId) {
+	public void setActionId(Long actionId) {
 		this.actionId = actionId;
 	}
 
-	public String getModelColorId() {
+	public Long getModelColorId() {
 		return modelColorId;
 	}
 
-	public void setModelColorId(String modelColorId) {
+	public void setModelColorId(Long modelColorId) {
 		this.modelColorId = modelColorId;
 	}
 

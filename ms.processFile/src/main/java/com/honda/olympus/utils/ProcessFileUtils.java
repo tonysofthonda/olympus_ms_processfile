@@ -8,15 +8,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.util.ResourceUtils;
 
+import com.honda.olympus.exception.FileProcessException;
 import com.honda.olympus.vo.TemplateFieldVO;
 
 public class ProcessFileUtils {
+	
+	
+	private Integer totalEspaces =0;
 
 	public static Properties fetchProperties() {
 		Properties properties = new Properties();
@@ -30,7 +35,7 @@ public class ProcessFileUtils {
 		return properties;
 	}
 
-	public static JSONObject readProcessFileTemplate() {
+	public static JSONObject validateFileTemplate(Integer control) throws FileProcessException {
 
 		try {
 			File file = ResourceUtils.getFile("classpath:processFileTemplate.json");
@@ -58,33 +63,37 @@ public class ProcessFileUtils {
 			} else {
 
 				final List<Integer> totCaracters = new ArrayList<>();
+				final List<Integer> totDiferences = new ArrayList<>();
 
 				templateFields.forEach(item -> {
 
 					JSONObject obj = (JSONObject) item;
-
 					totCaracters.add(obj.getInt("Spaces"));
-
-					int diference = obj.getInt("Position_end") - obj.getInt("Position_start");
-
-					System.out.println(obj.toString());
-					System.out.println("Dif: "+diference);
-					System.out.println("Spaces: " + obj.getInt("Spaces"));
-
+					totDiferences.add((obj.getInt("Position_end") - obj.getInt("Position_start"))+1);
+	
 				});
+				
+				int sumCaracters = totCaracters.stream().mapToInt(Integer::intValue).sum();
+				int sumDiferences = totDiferences.stream().mapToInt(Integer::intValue).sum();
+				
+				if(sumCaracters != control || sumDiferences != control) {
+					
+					throw new FileProcessException("Incorrect template specification");
+					
+				}
 
 			}
 
 			return result;
 		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+			throw new FileProcessException("Error reading or processing: processFileTemplate.json file");
+			
+			
 		}
 
 	}
 
-	public static List<TemplateFieldVO> readProcessFileTemplate(JSONObject template, final String line,
-			final Integer lineNumber) {
+	public static List<TemplateFieldVO> readProcessFileTemplate(JSONObject template, final String line) {
 
 		List<TemplateFieldVO> fileValues = new ArrayList<>();
 
@@ -113,5 +122,25 @@ public class ProcessFileUtils {
 		return fileValues;
 
 	}
+	
+	public static Optional<TemplateFieldVO> getLineValueOfField(List<TemplateFieldVO> dataLine,String fieldName) {
+		
+		return dataLine.stream().filter(c -> c.getFieldName().equalsIgnoreCase(fieldName)).findFirst();
+		
+
+	}
+	
+	
+
+
+	public Integer getTotalEspaces() {
+		return totalEspaces;
+	}
+
+	public void setTotalEspaces(Integer totalEspaces) {
+		this.totalEspaces = totalEspaces;
+	}
+	
+	
 
 }

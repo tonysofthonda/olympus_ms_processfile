@@ -17,19 +17,22 @@ public class LogEventService {
 	private String notificationURI;
 
 	public void sendLogEvent(EventVO message) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		RestTemplate restTemplate = new RestTemplate();
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			RestTemplate restTemplate = new RestTemplate();
 
-		HttpEntity<EventVO> requestEntity = new HttpEntity<>(message, headers);
+			HttpEntity<EventVO> requestEntity = new HttpEntity<>(message, headers);
 
-		ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
-				ResponseVO.class);
+			ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
+					ResponseVO.class);
 
-		System.out.println("Status Code: " + responseEntity.getStatusCode());
-		System.out.println("Message: " + responseEntity.getBody().getMessage());
-		System.out.println("Location: " + responseEntity.getHeaders().getLocation());
+			System.out.println("Status Code: " + responseEntity.getStatusCode());
+			System.out.println("Message: " + responseEntity.getBody().getMessage());
+			System.out.println("Location: " + responseEntity.getHeaders().getLocation());
+		} catch (Exception e) {
+			System.out.println("Error calling logEvent service");
+		}
 
 	}
 }
-

@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.honda.olympus.dao.AfeModelEntity;
+import com.honda.olympus.dao.AfeModelTypeEntity;
 
 @Repository
-public interface AfeModelRepository extends JpaRepository<AfeModelEntity, Long> {
+public interface AfeModelTypeRepository extends JpaRepository<AfeModelTypeEntity, Long>{
 
-	// QUERY3
-	@Query("SELECT o FROM AfeModelEntity o WHERE o.id = :id ")
-	List<AfeModelEntity> findAllById(@Param("id") Long id);
-
+	// QUERY4
+		@Query("SELECT o FROM AfeModelTypeEntity o WHERE o.id = :id ")
+		List<AfeModelTypeEntity> findAllById(@Param("id") Long id);
+	
 }

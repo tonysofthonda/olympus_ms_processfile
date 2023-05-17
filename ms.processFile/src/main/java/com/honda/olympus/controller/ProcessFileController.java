@@ -33,7 +33,7 @@ public class ProcessFileController {
 			
 		
 
-		return new ResponseEntity<ResponseVO>(new ResponseVO("Notification sent successsfully", null), HttpStatus.OK);
+		return new ResponseEntity<ResponseVO>(new ResponseVO("File processed successsfully", null), HttpStatus.OK);
 
 	}
 	

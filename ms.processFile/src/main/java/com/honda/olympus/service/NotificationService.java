@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.honda.olympus.vo.MessageVO;
 import com.honda.olympus.vo.ResponseVO;
 
@@ -18,22 +16,26 @@ public class NotificationService {
 
 	@Value("${notification.service.url}")
 	private String notificationURI;
-	
-	public void generatesNotification(MessageVO message) throws JsonMappingException, JsonProcessingException{
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		RestTemplate restTemplate = new RestTemplate();
-		
-		message = new MessageVO("1", "File Processed", "fileName.txt");
-		
-		HttpEntity<MessageVO> requestEntity = new HttpEntity<>(message, headers);
 
-		ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity, ResponseVO.class);
+	public void generatesNotification(MessageVO message) {
 
-		System.out.println("Status Code: " + responseEntity.getStatusCode());	
-		System.out.println("Message: " + responseEntity.getBody().getMessage());		
-		System.out.println("Location: " + responseEntity.getHeaders().getLocation());
-		
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			RestTemplate restTemplate = new RestTemplate();
+
+			HttpEntity<MessageVO> requestEntity = new HttpEntity<>(message, headers);
+
+			ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
+					ResponseVO.class);
+
+			System.out.println("Notification sent with Status Code: " + responseEntity.getStatusCode());
+			System.out.println("Message: " + responseEntity.getBody().getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error calling Notification service");
+		}
+
 	}
-	
+
 }

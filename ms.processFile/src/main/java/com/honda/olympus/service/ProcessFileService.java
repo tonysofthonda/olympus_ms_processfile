@@ -5,9 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,13 @@ import com.honda.olympus.controller.repository.AfeColorRepository;
 import com.honda.olympus.controller.repository.AfeFixedOrdersEvRepository;
 import com.honda.olympus.controller.repository.AfeModelRepository;
 import com.honda.olympus.controller.repository.AfeModelTypeRepository;
+import com.honda.olympus.controller.repository.AfeOrdersHistoryRepository;
 import com.honda.olympus.dao.AfeActionEntity;
 import com.honda.olympus.dao.AfeFixedOrdersEvEntity;
 import com.honda.olympus.dao.AfeModelColorEntity;
 import com.honda.olympus.dao.AfeModelEntity;
 import com.honda.olympus.dao.AfeModelTypeEntity;
+import com.honda.olympus.dao.AfeOrdersHistoryEntity;
 import com.honda.olympus.exception.FileProcessException;
 import com.honda.olympus.utils.ProcessFileUtils;
 import com.honda.olympus.vo.EventVO;
@@ -35,6 +39,9 @@ public class ProcessFileService {
 
 	@Autowired
 	LogEventService logEventService;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@Value("${message.fail.status}")
 	private String messageFailStatus;
@@ -80,6 +87,9 @@ public class ProcessFileService {
 
 	@Autowired
 	AfeActionRepository afeActionRepository;
+	
+	@Autowired
+	AfeOrdersHistoryRepository afeOrdersHistoryRepository;
 
 	private EventVO event = new EventVO();
 	private JSONObject template;
@@ -152,7 +162,7 @@ public class ProcessFileService {
 						"GM-ORD-REQ-ACTION");
 
 				if (actionFlow.isPresent()) {
-					System.out.println("operation: " + actionFlow.get().getValue());
+					System.out.println("----------------- operation: " + actionFlow.get().getValue()+" --------------------------");
 					if (actionFlow.get().getValue().equalsIgnoreCase(CREATE)) {
 						createFlow(dataList, fileName);
 					} else {
@@ -170,6 +180,7 @@ public class ProcessFileService {
 
 	}
 
+	@Transactional
 	private void createFlow(List<TemplateFieldVO> dataLine, String fileName) throws FileProcessException {
 		System.out.println("Start:: Create Flow");
 
@@ -275,9 +286,44 @@ public class ProcessFileService {
 		fixedOrder.setStartDay(getStringValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 		fixedOrder.setDueDate(getStringValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
 		fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "MDL-ID", fileName));
+		fixedOrder.setCreationTimeStamp(new Date());
 		
-		afeFixedOrdersEvRepository.save(fixedOrder);
-
+		try {
+			afeFixedOrdersEvRepository.save(fixedOrder);
+		} catch (Exception e) {
+			System.out.println("End fifth altern flow");
+			event = new EventVO(serviceName, ZERO_STATUS,
+					"No se inserto correctamente la linea: "+dataLine.get(0).lineNumber+" en la tabla afedb.afe_fixed_orders_ev", fileName);
+			logEventService.sendLogEvent(event);
+		}
+		
+		
+		AfeOrdersHistoryEntity orderHistory = new AfeOrdersHistoryEntity();
+		orderHistory.setActionId(actions.get(0).getId());
+		orderHistory.setFixedOrderId(fixedOrder.getId());
+		orderHistory.setCreationTimeStamp(new Date());
+		try {
+			afeOrdersHistoryRepository.save(orderHistory);
+		} catch (Exception e) {
+			System.out.println("Error inserting afedb.afe_fixed_orders_ev");
+			event = new EventVO(serviceName, ZERO_STATUS,
+					"No se inserto correctamente la linea: "+dataLine.get(0).lineNumber+" en la tabla afedb.afe_orders_history", fileName);
+			logEventService.sendLogEvent(event);
+			
+			MessageVO messageEvent = new MessageVO(serviceName,ONE_STATUS ,"No se inserto correctamente la linea: "+dataLine.get(0).lineNumber+" en la tabla afedb.afe_orders_history", fileName);
+			notificationService.generatesNotification(messageEvent);
+		}
+		
+		
+		String successMessage = "Inserción exitosa de la línea:\n"+dataLine.get(0).lineNumber+"\n Tokens: \n"+dataLine.toString()+"\n en la tabla AFE_FIXED_ORDERS_EV y en la tabla AFE_ORDERS_HISTORY";
+		
+		event = new EventVO(serviceName, ONE_STATUS,successMessage
+				, fileName);
+		logEventService.sendLogEvent(event);
+		
+		MessageVO messageEvent = new MessageVO(serviceName,ONE_STATUS ,successMessage, fileName);
+		notificationService.generatesNotification(messageEvent);
+		
 		System.out.println("End:: Create Flow");
 
 	}
@@ -306,7 +352,6 @@ public class ProcessFileService {
 								+ templateField.get().getValue(),
 						fileName));
 
-				// return to main line process loop
 				return null;
 			}
 
@@ -315,7 +360,7 @@ public class ProcessFileService {
 		return longValue;
 
 	}
-	
+
 	private String getStringValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) {
 		Optional<TemplateFieldVO> templateField = ProcessFileUtils.getLineValueOfField(dataLine, fieldName);
 
@@ -325,15 +370,13 @@ public class ProcessFileService {
 				longValue = templateField.get().getValue();
 			} catch (Exception e) {
 
-				System.out.println(
-						"La línea leida no cumple con los requerimientos establecidos: format exception: "
-								+ templateField.get().getValue());
+				System.out.println("La línea leida no cumple con los requerimientos establecidos: format exception: "
+						+ templateField.get().getValue());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: format exception: "
 								+ templateField.get().getValue(),
 						fileName));
 
-				// return to main line process loop
 				return null;
 			}
 

@@ -6,6 +6,9 @@ public class ResponseVO {
 
 	private String message;
 	private List<String> details;
+	
+	public ResponseVO() {
+	}
 
 	public ResponseVO(String message, List<String> details) {
 		super();

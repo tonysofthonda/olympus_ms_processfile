@@ -39,7 +39,7 @@ public class TemplateFieldVO {
 
 	@Override
 	public String toString() {
-		return "TemplateFieldVO [fieldName=" + fieldName + ", value=" + value + ", lineNumber=" + lineNumber + "]";
+		return "[fieldName=" + fieldName + ", value=" + value + "]\n";
 	}
 
 }

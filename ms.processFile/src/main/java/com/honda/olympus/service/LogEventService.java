@@ -27,7 +27,7 @@ public class LogEventService {
 			ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
 					ResponseVO.class);
 
-			System.out.println("Status Code: " + responseEntity.getStatusCode());
+			System.out.println("LogEvent created with Status Code: " + responseEntity.getStatusCode());
 			System.out.println("Message: " + responseEntity.getBody().getMessage());
 			System.out.println("Location: " + responseEntity.getHeaders().getLocation());
 		} catch (Exception e) {

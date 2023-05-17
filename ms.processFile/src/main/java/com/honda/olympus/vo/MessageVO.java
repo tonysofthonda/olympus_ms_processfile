@@ -6,6 +6,8 @@ import javax.validation.constraints.Size;
 
 public class MessageVO {
 
+	private String source;
+	
 	@Size(min = 1,max=3,message = "staus not allowed")
 	@NotNull(message = "status is mandatory")
 	private String status;
@@ -13,14 +15,24 @@ public class MessageVO {
 	@NotBlank(message = "msg is mandatory")
 	private String msg;
 	
-	@NotBlank(message = "file is mandatory")
 	private String file;
 
-	public MessageVO(String status, String msg, String file) {
+	public MessageVO(@NotBlank(message = "source is mandatory") String source,
+			@Size(min = 1, max = 3, message = "staus not allowed") @NotNull(message = "status is mandatory") String status,
+			@NotBlank(message = "msg is mandatory") String msg, String file) {
 		super();
+		this.source = source;
 		this.status = status;
 		this.msg = msg;
 		this.file = file;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 
 	public String getStatus() {
@@ -49,7 +61,9 @@ public class MessageVO {
 
 	@Override
 	public String toString() {
-		return "MessageVO [status=" + status + ", msg=" + msg + ", file=" + file + "]";
+		return "MessageVO [source=" + source + ", status=" + status + ", msg=" + msg + ", file=" + file + "]";
 	}
+
+	
 
 }

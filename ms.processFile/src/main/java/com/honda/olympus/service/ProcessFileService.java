@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -136,20 +137,30 @@ public class ProcessFileService {
 		dataLines = new ArrayList<>();
 
 		if (!Files.exists(path)) {
+			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,messageFailExist + ": " + HOME + DELIMITER + "/" + fileName,fileName));
 			throw new FileProcessException(messageFailExist + ": " + HOME + DELIMITER + "/" + fileName);
 		}
 
-		Files.lines(path).forEach(line -> {
-			System.out.println(line);
-			System.out.println(line.length());
+		
+		try (Stream<String> input = Files.lines(path)){
+			input.forEach(line -> {
+				System.out.println(line);
+				System.out.println(line.length());
 
-			if (line.length() == lineSize) {
-				dataLines.add(ProcessFileUtils.readProcessFileTemplate(template, line));
-			} else {
-				dataLines.add(new ArrayList<>());
-			}
+				if (line.length() == lineSize) {
+					dataLines.add(ProcessFileUtils.readProcessFileTemplate(template, line));
+				} else {
+					dataLines.add(new ArrayList<>());
+				}
 
-		});
+			});
+			
+		} catch (Exception e) {
+			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,"No es posible abrir el archivo: " + ": " + HOME + DELIMITER + "/" + fileName,fileName));
+			throw new FileProcessException("No es posible abrir el archivo: "+ fileName);
+		}
+		
+		
 
 		// Main reading lines loop
 		for (List<TemplateFieldVO> dataList : dataLines) {
@@ -167,7 +178,7 @@ public class ProcessFileService {
 						"GM-ORD-REQ-ACTION");
 
 				if (actionFlow.isPresent()) {
-					System.out.println("----------------- operation: " + actionFlow.get().getValue()+ " --------------------------");
+					System.out.println("----------------- Operation: " + actionFlow.get().getValue()+ " --------------------------");
 					if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CREATE)) {
 						createFlow(dataList, fileName);
 					} else {
@@ -372,7 +383,7 @@ public class ProcessFileService {
 
 		// query.idFixedOrder
 		// QUERY10
-		List<EventCodeEntity> eventCode = afeEventCodeRepository.findAllByEventCode(statusEv.get(0).getId());
+		List<EventCodeEntity> eventCode = afeEventCodeRepository.findAllByEventCode(statusEv.get(0).getEventCodeId());
 
 		if (eventCode.isEmpty()) {
 			System.out.println("End third cancel/change altern flow");
@@ -398,7 +409,8 @@ public class ProcessFileService {
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("FixedOrder DOESN'T exist");
+			System.out.println("El event_code_number es mayor o igual a 2500, " + " event_coe_number :"
+					+ eventCode.get(0).getEventCodeNumber());
 
 			return;
 		}
@@ -425,7 +437,7 @@ public class ProcessFileService {
 			fixedOrder.setStartDay(getStringValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 			fixedOrder.setDueDate(getStringValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
 			fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "MDL-ID", fileName));
-			fixedOrder.setCreationTimeStamp(new Date());
+			fixedOrder.setUpdateTimeStamp(new Date());
 
 			afeFixedOrdersEvRepository.saveAndFlush(fixedOrder);
 
@@ -439,6 +451,8 @@ public class ProcessFileService {
 			// return to main line process loop
 			System.out.println("Error updating AFE_FIXED_ORDERS_EV");
 
+		} catch(NumberFormatException e) {
+			return;
 		}
 
 		// query.idFixedOrder
@@ -503,14 +517,14 @@ public class ProcessFileService {
 		}
 	}
 
-	private Long getLongValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) {
+	private Long getLongValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) throws NumberFormatException {
 		Optional<TemplateFieldVO> templateField = ProcessFileUtils.getLineValueOfField(dataLine, fieldName);
 
 		Long longValue = null;
 		if (templateField.isPresent()) {
 			try {
 				longValue = Long.parseLong(templateField.get().getValue());
-				System.out.println("allowed long maxvalue: " + Long.MAX_VALUE);
+				//System.out.println("allowed long maxvalue: " + Long.MAX_VALUE);
 			} catch (NumberFormatException e) {
 
 				System.out.println(
@@ -521,7 +535,7 @@ public class ProcessFileService {
 								+ templateField.get().getValue(),
 						fileName));
 
-				return null;
+				throw e;
 			}
 
 		}

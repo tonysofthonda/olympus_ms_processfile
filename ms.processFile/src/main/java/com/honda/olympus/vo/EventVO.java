@@ -2,19 +2,17 @@ package com.honda.olympus.vo;
 
 public class EventVO {
 	private String source;
-	private String status;
+	private Long status;
 
 	private String msg;
 
 	private String file;
-	
-	
 
 	public EventVO() {
 		super();
 	}
 
-	public EventVO(String source, String status, String msg, String file) {
+	public EventVO(String source, Long status, String msg, String file) {
 		super();
 		this.source = source;
 		this.status = status;
@@ -30,11 +28,11 @@ public class EventVO {
 		this.source = source;
 	}
 
-	public String getStatus() {
+	public Long getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Long status) {
 		this.status = status;
 	}
 

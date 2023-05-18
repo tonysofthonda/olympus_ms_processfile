@@ -18,6 +18,7 @@ public class LogEventService {
 
 	public void sendLogEvent(EventVO message) {
 		try {
+			System.out.println("Calling logEvent service");
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			RestTemplate restTemplate = new RestTemplate();
@@ -31,7 +32,7 @@ public class LogEventService {
 			System.out.println("Message: " + responseEntity.getBody().getMessage());
 			System.out.println("Location: " + responseEntity.getHeaders().getLocation());
 		} catch (Exception e) {
-			System.out.println("Error calling logEvent service");
+			System.out.println("Error calling logEvent service "+e.getLocalizedMessage());
 		}
 
 	}

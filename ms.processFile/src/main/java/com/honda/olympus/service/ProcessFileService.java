@@ -70,7 +70,7 @@ public class ProcessFileService {
 
 	@Value("${service.name}")
 	private String serviceName;
-	
+
 	@Value("${demo.mode}")
 	private Boolean demoMode;
 
@@ -109,20 +109,22 @@ public class ProcessFileService {
 
 		template = ProcessFileUtils.validateFileTemplate(lineSize);
 
-		if (!ProcessFileConstants.ONE_STATUS.equals(status) ) {
-			
+		if (!ProcessFileConstants.ONE_STATUS.equals(status)) {
+
 			message.setMsg(messageFailStatus);
 			message.setStatus(ProcessFileConstants.ZERO_STATUS);
-			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,messageFailStatus,message.getFile()));
+			logEventService.sendLogEvent(
+					new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, messageFailStatus, message.getFile()));
 
 			throw new FileProcessException(messageFailStatus);
 		}
 
 		if (message.getFile().isEmpty()) {
-			
+
 			message.setMsg(messageFailName);
 			message.setStatus(ProcessFileConstants.ZERO_STATUS);
-			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,messageFailName,message.getFile()));
+			logEventService.sendLogEvent(
+					new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, messageFailName, message.getFile()));
 
 			throw new FileProcessException(messageFailName);
 		}
@@ -138,19 +140,18 @@ public class ProcessFileService {
 		List<List<TemplateFieldVO>> dataLines;
 		Path path = Paths.get(HOME + DELIMITER + fileName);
 		dataLines = new ArrayList<>();
-		
-		if(demoMode) {
-			
+
+		if (demoMode) {
+
 		}
-		
 
 		if (!Files.exists(path)) {
-			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,messageFailExist + ": " + HOME + DELIMITER + "/" + fileName,fileName));
+			logEventService.sendLogEvent(new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					messageFailExist + ": " + HOME + DELIMITER + "/" + fileName, fileName));
 			throw new FileProcessException(messageFailExist + ": " + HOME + DELIMITER + "/" + fileName);
 		}
 
-		
-		try (Stream<String> input = Files.lines(path)){
+		try (Stream<String> input = Files.lines(path)) {
 			input.forEach(line -> {
 				System.out.println(line);
 				System.out.println(line.length());
@@ -162,19 +163,19 @@ public class ProcessFileService {
 				}
 
 			});
-			
+
 		} catch (Exception e) {
-			logEventService.sendLogEvent(new EventVO(serviceName,ProcessFileConstants.ZERO_STATUS,"No es posible abrir el archivo: " + ": " + HOME + DELIMITER + "/" + fileName,fileName));
-			throw new FileProcessException("No es posible abrir el archivo: "+ fileName);
+			logEventService.sendLogEvent(new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					"No es posible abrir el archivo: " + ": " + HOME + DELIMITER + "/" + fileName, fileName));
+			throw new FileProcessException("No es posible abrir el archivo: " + fileName);
 		}
-		
-		
 
 		// Main reading lines loop
 		for (List<TemplateFieldVO> dataList : dataLines) {
 
 			if (dataList.isEmpty()) {
-				System.out.println("La línea leida no cumple con los requerimientos establecidos: " + dataList.toString());
+				System.out.println(
+						"La línea leida no cumple con los requerimientos establecidos: " + dataList.toString());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ProcessFileConstants.ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: ", fileName));
 
@@ -186,18 +187,18 @@ public class ProcessFileService {
 						"GM-ORD-REQ-ACTION");
 
 				if (actionFlow.isPresent()) {
-					System.out.println("----------------- Operation: " + actionFlow.get().getValue()+ " --------------------------");
+					System.out.println("----------------- Operation: " + actionFlow.get().getValue()
+							+ " --------------------------");
 					if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CREATE)) {
 						createFlow(dataList, fileName);
 					} else {
 
 						if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CHANGE)
-								||actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CANCEL) ) {
+								|| actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CANCEL)) {
 							cancelChangeFlow(dataList, fileName);
-						}else {
+						} else {
 							System.out.println("Operation undefied");
 						}
-						
 
 					}
 
@@ -216,7 +217,12 @@ public class ProcessFileService {
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY1
-		Long idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+		Long idFixedOrder;
+		try {
+			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+		} catch (NumberFormatException e) {
+			return;
+		}
 
 		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findAllById(idFixedOrder);
 		if (!fixedOrders.isEmpty()) {
@@ -234,7 +240,12 @@ public class ProcessFileService {
 		// AFE_MODEL_COLOR
 		// linea.MDL_ID
 		// QUERY2
-		Long modelColorId = getLongValueOfFieldInLine(dataLine, "MDL-ID", fileName);
+		Long modelColorId;
+		try {
+			modelColorId = getLongValueOfFieldInLine(dataLine, "MDL-ID", fileName);
+		} catch (NumberFormatException e) {
+			return;
+		}
 
 		List<AfeModelColorEntity> modelColors = afeColorRepository.findAllById(modelColorId);
 		if (modelColors.isEmpty()) {
@@ -297,9 +308,8 @@ public class ProcessFileService {
 			return;
 		}
 
-		
-		//QUERY6
-		
+		// QUERY6
+
 		AfeFixedOrdersEvEntity fixedOrder = new AfeFixedOrdersEvEntity();
 		fixedOrder.setEnvioFlag(Boolean.FALSE);
 		fixedOrder.setActionId(actions.get(0).getId());
@@ -329,12 +339,12 @@ public class ProcessFileService {
 			logEventService.sendLogEvent(event);
 		}
 
-		//QUERY7
-		//QUERY8
-		if(!insertOrderHistory(actions.get(0).getId(), fixedOrder.getId(), dataLine, fileName)) {
+		// QUERY7
+		// QUERY8
+		if (!insertOrderHistory(actions.get(0).getId(), fixedOrder.getId(), dataLine, fileName)) {
 			return;
 		}
-		
+
 		String successMessage = "Inserción exitosa de la línea:\n" + dataLine.get(0).lineNumber + "\n Tokens: \n"
 				+ dataLine.toString() + "\n en la tabla AFE_FIXED_ORDERS_EV y en la tabla AFE_ORDERS_HISTORY";
 
@@ -354,7 +364,13 @@ public class ProcessFileService {
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY8
-		Long idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+		Long idFixedOrder;
+		try {
+			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+
+		} catch (NumberFormatException e) {
+			return;
+		}
 
 		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findAllById(idFixedOrder);
 		if (fixedOrders.isEmpty()) {
@@ -362,8 +378,9 @@ public class ProcessFileService {
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"NO Existe el Id: en la tabla afedb.afe_fixed_orders_ev con el query: ", fileName);
 			logEventService.sendLogEvent(event);
-			
-			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS, "NO Existe el Id: en la tabla afedb.afe_fixed_orders_ev con el query: ", fileName);
+
+			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS,
+					"NO Existe el Id: en la tabla afedb.afe_fixed_orders_ev con el query: ", fileName);
 			notificationService.generatesNotification(messageEvent);
 
 			// return to main line process loop
@@ -434,7 +451,8 @@ public class ProcessFileService {
 			fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-MDL-YR", fileName));
 			fixedOrder.setSellingCode(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-SELLING-SRC-CD", fileName));
 			fixedOrder.setOriginType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORIGIN-TYPE", fileName));
-			fixedOrder.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-CD", fileName));
+			fixedOrder
+					.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-CD", fileName));
 			fixedOrder.setOrderType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORD-TYP-CD", fileName));
 			fixedOrder.setChrgAsct(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
 			fixedOrder.setChrgFcm(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
@@ -459,7 +477,7 @@ public class ProcessFileService {
 			// return to main line process loop
 			System.out.println("Error updating AFE_FIXED_ORDERS_EV");
 
-		} catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			return;
 		}
 
@@ -486,7 +504,7 @@ public class ProcessFileService {
 		if (!insertOrderHistory(action.get(0).getId(), idFixedOrder, dataLine, fileName)) {
 			return;
 		}
-		
+
 		String successMessage = "Actualización exitosa de la línea:\n" + dataLine.get(0).lineNumber + "\n Tokens: \n"
 				+ dataLine.toString() + "\n en la tabla AFE_FIXED_ORDERS_EV y en la tabla AFE_ORDERS_HISTORY";
 
@@ -525,14 +543,15 @@ public class ProcessFileService {
 		}
 	}
 
-	private Long getLongValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) throws NumberFormatException {
+	private Long getLongValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName)
+			throws NumberFormatException {
 		Optional<TemplateFieldVO> templateField = ProcessFileUtils.getLineValueOfField(dataLine, fieldName);
 
 		Long longValue = null;
 		if (templateField.isPresent()) {
 			try {
 				longValue = Long.parseLong(templateField.get().getValue());
-				//System.out.println("allowed long maxvalue: " + Long.MAX_VALUE);
+				// System.out.println("allowed long maxvalue: " + Long.MAX_VALUE);
 			} catch (NumberFormatException e) {
 
 				System.out.println(

@@ -19,22 +19,20 @@ import com.honda.olympus.vo.ResponseVO;
 
 @RestController
 public class ProcessFileController {
-	
+
 	@Autowired
 	ProcessFileService processFileService;
-	
+
 	@PostMapping(value = "/file", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ResponseVO> processFile(@Valid @RequestBody MessageVO message)
 			throws FileProcessException, IOException {
 
 		System.out.println(message.toString());
-		
+
 		processFileService.processFile(message);
-			
-		
 
 		return new ResponseEntity<ResponseVO>(new ResponseVO("File processed successsfully", null), HttpStatus.OK);
 
 	}
-	
+
 }

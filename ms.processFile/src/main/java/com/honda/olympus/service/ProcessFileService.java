@@ -109,7 +109,7 @@ public class ProcessFileService {
 
 		template = ProcessFileUtils.validateFileTemplate(lineSize);
 
-		if (ProcessFileConstants.ONE_STATUS.equals(status) ) {
+		if (!ProcessFileConstants.ONE_STATUS.equals(status) ) {
 			
 			message.setMsg(messageFailStatus);
 			message.setStatus(ProcessFileConstants.ZERO_STATUS);

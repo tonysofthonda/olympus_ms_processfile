@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.honda.olympus.vo.EventVO;
-import com.honda.olympus.vo.ResponseVO;
 
 @Service
 public class LogEventService {

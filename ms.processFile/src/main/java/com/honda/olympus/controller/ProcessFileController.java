@@ -23,7 +23,7 @@ public class ProcessFileController {
 	@Autowired
 	ProcessFileService processFileService;
 	
-	@PostMapping(value = "/olympus/v1/file", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/file", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ResponseVO> processFile(@Valid @RequestBody MessageVO message)
 			throws FileProcessException, IOException {
 

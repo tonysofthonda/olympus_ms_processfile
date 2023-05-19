@@ -25,12 +25,11 @@ public class LogEventService {
 
 			HttpEntity<EventVO> requestEntity = new HttpEntity<>(message, headers);
 
-			ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
-					ResponseVO.class);
+			ResponseEntity<String> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
+					String.class);
 
 			System.out.println("LogEvent created with Status Code: " + responseEntity.getStatusCode());
-			System.out.println("Message: " + responseEntity.getBody().getMessage());
-			System.out.println("Location: " + responseEntity.getHeaders().getLocation());
+			System.out.println("Message: " + responseEntity.getBody());
 		} catch (Exception e) {
 			System.out.println("Error calling logEvent service "+e.getLocalizedMessage());
 		}

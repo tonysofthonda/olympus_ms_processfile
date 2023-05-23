@@ -107,7 +107,15 @@ public class ProcessFileService {
 
 		final Long status = message.getStatus();
 
-		template = ProcessFileUtils.validateFileTemplate(lineSize);
+		try {
+			template = ProcessFileUtils.validateFileTemplate(lineSize);
+			
+		} catch (FileProcessException e) {
+			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "Incorrect template specification","");
+			logEventService.sendLogEvent(event);
+			throw e;
+		}
+		
 
 		if (!ProcessFileConstants.ONE_STATUS.equals(status)) {
 

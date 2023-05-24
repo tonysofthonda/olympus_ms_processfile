@@ -26,11 +26,9 @@ This application exposes 2 single endpoints (as a RESTFul service)
 
 6. The expected result at the end of file processing will new created or updated rows in Data Base, and service wil send a response like:
 
-
-
 {
     "message": "File processed successsfully",
-    "details": null
+    "details": 
 }
 
 

@@ -11,17 +11,18 @@ This application exposes 2 single endpoints (as a RESTFul service)
 ## How it works
 
 1. The project includes a properties file  (**application.properties**), with the entries:  
-   `file.sourcedir: To indicate where the file should be read`
-   `mftp.credentials.host, mftp.credentials.port, mftp.credentials.user, mftp.credentials.pass: To indicate user credentials for MFTP server`
-   `monitor.workdir.inbound: To indicate the source folder in witch scheduller will be reading the files`
-
-2. On a daily basis, the module runs a scheduller customizable job that perform the next:  
+   `file.sourcedir: To indicate where the file should be read`.
+   A `processFileTemplate file: To indicate how lines and data should be read`.
      
-3. Perform a conecction to a MFTP server with the provided host & credentials  
+2. Once called the service, the template file is validated to ensure the correct data lecture and extraction, if this is incorrect the process ends throwing an exception.  
    
-4. If the shceduller finds one or more files, this will select the **First File**, the one with the newest date in the customatizable folder.
+3. The service performs a validation over the file that will be read, if the file can not be read, the service throws an exception.
 
-5. At the end, **ms.transferfile** will be called sending the next information: 
+4. If evehing is correct the service will perform an extraction of each line separated by "\n", will create tokens for each of the fileds that will be processed.
+
+5. Each of these tokens are separately processed, and acording the instructions contained in the line, data base instructions will be performed.
+
+5. If errors ocurss during the 
 
 {
     "status": 1,

@@ -19,7 +19,7 @@
       "Spaces": 4,
       "Position_start": 13,
       "Position_end": 16,
-      "Description": "Año del modelo"
+      "Description": "Anio del modelo"
     },
     {
       "field": "GM-ORD-REQ-SELLING-SRC-CD",
@@ -68,14 +68,14 @@
       "Spaces": 11,
       "Position_start": 78,
       "Position_end": 88,
-      "Description": "envío Busns fcn CD"
+      "Description": "envio Busns fcn CD"
     },
     {
       "field": "GM-ORD-REQ-CHRG-BUSNS-FCN-CD",
       "Spaces": 5,
       "Position_start": 89,
       "Position_end": 93,
-      "Description": "envío Busns fcn CD"
+      "Description": "envio Busns fcn CD"
     },
     {
       "field": "GM-ORD-REQ-REQST-ID",
@@ -103,7 +103,7 @@
       "Spaces": 10,
       "Position_start": 116,
       "Position_end": 125,
-      "Description": "Día inicio producción"
+      "Description": "Dia inicio produccion"
     },
     {
       "field": "GM-ORD-DUE-DT",

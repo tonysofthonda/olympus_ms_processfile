@@ -41,6 +41,9 @@ import com.honda.olympus.vo.EventVO;
 import com.honda.olympus.vo.MessageVO;
 import com.honda.olympus.vo.TemplateFieldVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class ProcessFileService {
 
@@ -70,9 +73,6 @@ public class ProcessFileService {
 
 	@Value("${service.name}")
 	private String serviceName;
-
-	@Value("${demo.mode}")
-	private Boolean demoMode;
 
 	private static final String DELIMITER = "/";
 
@@ -111,7 +111,7 @@ public class ProcessFileService {
 			template = ProcessFileUtils.validateFileTemplate(lineSize);
 			
 		} catch (FileProcessException e) {
-			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "Incorrect template specification","");
+			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "Incorrect template specification",message.getFile());
 			logEventService.sendLogEvent(event);
 			throw e;
 		}
@@ -139,7 +139,7 @@ public class ProcessFileService {
 
 		processFileData(message.getFile());
 
-		System.out.println("File procesed");
+		log.info("File procesed");
 
 	}
 
@@ -149,10 +149,6 @@ public class ProcessFileService {
 		Path path = Paths.get(HOME + DELIMITER + fileName);
 		dataLines = new ArrayList<>();
 
-		if (demoMode) {
-
-		}
-
 		if (!Files.exists(path)) {
 			logEventService.sendLogEvent(new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					messageFailExist + ": " + HOME + DELIMITER + "/" + fileName, fileName));
@@ -161,8 +157,8 @@ public class ProcessFileService {
 
 		try (Stream<String> input = Files.lines(path)) {
 			input.forEach(line -> {
-				System.out.println(line);
-				System.out.println(line.length());
+				log.info("Line: {}",line);
+				log.info("Line lenght: {}",line.length());
 
 				if (line.length() == lineSize) {
 					dataLines.add(ProcessFileUtils.readProcessFileTemplate(template, line));
@@ -182,8 +178,8 @@ public class ProcessFileService {
 		for (List<TemplateFieldVO> dataList : dataLines) {
 
 			if (dataList.isEmpty()) {
-				System.out.println(
-						"La línea leida no cumple con los requerimientos establecidos: " + dataList.toString());
+				log.info(
+						"La línea leida no cumple con los requerimientos establecidos: {}", dataList.toString());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ProcessFileConstants.ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: ", fileName));
 
@@ -195,7 +191,7 @@ public class ProcessFileService {
 						"GM-ORD-REQ-ACTION");
 
 				if (actionFlow.isPresent()) {
-					System.out.println("----------------- Operation: " + actionFlow.get().getValue()
+					log.info("----------------- Operation: " + actionFlow.get().getValue()
 							+ " --------------------------");
 					if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CREATE)) {
 						createFlow(dataList, fileName);
@@ -205,13 +201,13 @@ public class ProcessFileService {
 								|| actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CANCEL)) {
 							cancelChangeFlow(dataList, fileName);
 						} else {
-							System.out.println("Operation undefied");
+							log.info("Operation undefied");
 						}
 
 					}
 
 				} else {
-					System.out.println("Operation undefined");
+					log.info("Operation undefined");
 				}
 
 			}
@@ -221,7 +217,7 @@ public class ProcessFileService {
 
 	@Transactional
 	private void createFlow(List<TemplateFieldVO> dataLine, String fileName) throws FileProcessException {
-		System.out.println("Start:: Create Flow");
+		log.info("Start:: Create Flow");
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY1
@@ -234,13 +230,13 @@ public class ProcessFileService {
 
 		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findAllById(idFixedOrder);
 		if (!fixedOrders.isEmpty()) {
-			System.out.println("End first altern flow");
+			log.info("End first altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"Existe el Id: en la tabla afedb.afe_fixed_orders_ev con el query: ", fileName);
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("FixedOrder exist");
+			log.info("FixedOrder exist");
 			return;
 
 		}
@@ -257,7 +253,7 @@ public class ProcessFileService {
 
 		List<AfeModelColorEntity> modelColors = afeColorRepository.findAllById(modelColorId);
 		if (modelColors.isEmpty()) {
-			System.out.println("End second altern flow");
+			log.info("End second altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"Existe el MDL_ID: en la tabla afedb.afe_model_color con el query: ", fileName);
 			logEventService.sendLogEvent(event);
@@ -273,7 +269,7 @@ public class ProcessFileService {
 
 		List<AfeModelEntity> models = modelRepository.findAllById(modelId);
 		if (models.isEmpty()) {
-			System.out.println("End third altern flow");
+			log.info("End third altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"Existe el MDL_ID: en la tabla afedb.afe_model con el query: ", fileName);
 			logEventService.sendLogEvent(event);
@@ -291,7 +287,7 @@ public class ProcessFileService {
 
 		List<AfeModelTypeEntity> modelTypes = modelTypeRepository.findAllById(modelTypeId);
 		if (modelTypes.isEmpty()) {
-			System.out.println("End fourth altern flow");
+			log.info("End fourth altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"Existe el MODEL_TYPE: en la tabla afedb.afe_model_type con el query: ", fileName);
 			logEventService.sendLogEvent(event);
@@ -307,7 +303,7 @@ public class ProcessFileService {
 
 		List<AfeActionEntity> actions = afeActionRepository.findAllByAction(action);
 		if (actions.isEmpty()) {
-			System.out.println("End fifth altern flow");
+			log.info("End fifth altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"Existe el MODEL_TYPE: en la tabla afedb.afe_model_type con el query: ", fileName);
 			logEventService.sendLogEvent(event);
@@ -341,7 +337,7 @@ public class ProcessFileService {
 		try {
 			afeFixedOrdersEvRepository.save(fixedOrder);
 		} catch (Exception e) {
-			System.out.println("End fifth altern flow");
+			log.info("End fifth altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "No se inserto correctamente la linea: "
 					+ dataLine.get(0).lineNumber + " en la tabla afedb.afe_fixed_orders_ev", fileName);
 			logEventService.sendLogEvent(event);
@@ -362,13 +358,13 @@ public class ProcessFileService {
 		MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS, successMessage, fileName);
 		notificationService.generatesNotification(messageEvent);
 
-		System.out.println("End:: Create Flow");
+		log.info("End:: Create Flow");
 
 	}
 
 	private void cancelChangeFlow(List<TemplateFieldVO> dataLine, String fileName) {
 
-		System.out.println("Start:: CHANGE/CANCEL Flow");
+		log.info("Start:: CHANGE/CANCEL Flow");
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY8
@@ -382,7 +378,7 @@ public class ProcessFileService {
 
 		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findAllById(idFixedOrder);
 		if (fixedOrders.isEmpty()) {
-			System.out.println("End first cancel/change altern flow");
+			log.info("End first cancel/change altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"NO Existe el Id: en la tabla afedb.afe_fixed_orders_ev con el query: ", fileName);
 			logEventService.sendLogEvent(event);
@@ -392,7 +388,7 @@ public class ProcessFileService {
 			notificationService.generatesNotification(messageEvent);
 
 			// return to main line process loop
-			System.out.println("FixedOrder DOESN'T exist");
+			log.info("FixedOrder DOESN'T exist");
 
 		}
 
@@ -402,13 +398,13 @@ public class ProcessFileService {
 		List<AfeStatusEvEntity> statusEv = afeStatusEvRepository.findAllByFixedOrder(idFixedOrder);
 
 		if (statusEv.isEmpty()) {
-			System.out.println("End second cancel/change altern flow");
+			log.info("End second cancel/change altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"NO Existe el status para el id: " + idFixedOrder + " ", fileName);
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("AFE_STATUS_EV DOESN'T exist");
+			log.info("AFE_STATUS_EV DOESN'T exist");
 
 			return;
 
@@ -419,13 +415,13 @@ public class ProcessFileService {
 		List<EventCodeEntity> eventCode = afeEventCodeRepository.findAllByEventCode(statusEv.get(0).getEventCodeId());
 
 		if (eventCode.isEmpty()) {
-			System.out.println("End third cancel/change altern flow");
+			log.info("End third cancel/change altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"NO Existe el event_code_number para el id: " + statusEv.get(0).getId() + " ", fileName);
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("FixedOrder DOESN'T exist");
+			log.info("FixedOrder DOESN'T exist");
 
 			return;
 
@@ -433,8 +429,8 @@ public class ProcessFileService {
 
 		if (eventCode.get(0).getEventCodeNumber() >= ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER) {
 
-			System.out.println("End fourth cancel/change altern flow,event_code_number < "
-					+ ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER);
+			log.info("End fourth cancel/change altern flow,event_code_number < {} ",
+					ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER);
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"El event_code_number es mayor o igual a 2500, " + " event_coe_number :"
 							+ eventCode.get(0).getEventCodeNumber(),
@@ -442,8 +438,8 @@ public class ProcessFileService {
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("El event_code_number es mayor o igual a 2500, " + " event_coe_number :"
-					+ eventCode.get(0).getEventCodeNumber());
+			log.info("El event_code_number es mayor o igual a 2500, " + " event_coe_number: {} ",
+					eventCode.get(0).getEventCodeNumber());
 
 			return;
 		}
@@ -483,7 +479,7 @@ public class ProcessFileService {
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("Error updating AFE_FIXED_ORDERS_EV");
+			log.info("Error updating AFE_FIXED_ORDERS_EV");
 
 		} catch (NumberFormatException e) {
 			return;
@@ -495,13 +491,13 @@ public class ProcessFileService {
 		List<AfeActionEntity> action = afeActionRepository.findAllByAction(actionId);
 
 		if (action.isEmpty()) {
-			System.out.println("End third cancel/change altern flow");
+			log.info("End third cancel/change altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					"NO Existe la acción " + actionId + " en la tabla AFE_ACTION con el query: ", fileName);
 			logEventService.sendLogEvent(event);
 
 			// return to main line process loop
-			System.out.println("AFE_ACTION DOESN'T exist");
+			log.info("AFE_ACTION DOESN'T exist");
 
 			return;
 
@@ -522,7 +518,7 @@ public class ProcessFileService {
 		MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS, successMessage, fileName);
 		notificationService.generatesNotification(messageEvent);
 
-		System.out.println("End:: Cancel/Change Flow");
+		log.info("End:: Cancel/Change Flow");
 
 	}
 
@@ -537,7 +533,7 @@ public class ProcessFileService {
 			afeOrdersHistoryRepository.save(orderHistory);
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			System.out.println("Error inserting afedb.afe_fixed_orders_ev");
+			log.info("Error inserting afedb.afe_fixed_orders_ev");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "No se inserto correctamente la linea: "
 					+ dataLine.get(0).lineNumber + " en la tabla afedb.afe_orders_history", fileName);
 			logEventService.sendLogEvent(event);
@@ -559,12 +555,12 @@ public class ProcessFileService {
 		if (templateField.isPresent()) {
 			try {
 				longValue = Long.parseLong(templateField.get().getValue());
-				// System.out.println("allowed long maxvalue: " + Long.MAX_VALUE);
+				// log.info("allowed long maxvalue: " + Long.MAX_VALUE);
 			} catch (NumberFormatException e) {
 
-				System.out.println(
-						"La línea leida no cumple con los requerimientos establecidos: format Number exception: "
-								+ templateField.get().getValue());
+				log.info(
+						"La línea leida no cumple con los requerimientos establecidos: format Number exception: {}",
+								templateField.get().getValue());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ProcessFileConstants.ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: format Number exception: "
 								+ templateField.get().getValue(),
@@ -588,8 +584,8 @@ public class ProcessFileService {
 				longValue = templateField.get().getValue();
 			} catch (Exception e) {
 
-				System.out.println("La línea leida no cumple con los requerimientos establecidos: format exception: "
-						+ templateField.get().getValue());
+				log.info("La línea leida no cumple con los requerimientos establecidos: format exception: {}",
+						templateField.get().getValue());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ProcessFileConstants.ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: format exception: "
 								+ templateField.get().getValue(),

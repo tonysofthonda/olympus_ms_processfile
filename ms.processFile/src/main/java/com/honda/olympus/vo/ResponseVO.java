@@ -1,19 +1,36 @@
 package com.honda.olympus.vo;
 
-import java.util.List;
-
 public class ResponseVO {
-
+	private String source;
+	private Long status;
 	private String message;
-	private List<String> details;
-	
+	private String file;
+
 	public ResponseVO() {
 	}
 
-	public ResponseVO(String message, List<String> details) {
+	public ResponseVO(String source, Long status, String message, String file) {
 		super();
+		this.source = source;
+		this.status = status;
 		this.message = message;
-		this.details = details;
+		this.file = file;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public Long getStatus() {
+		return status;
+	}
+
+	public void setStatus(Long status) {
+		this.status = status;
 	}
 
 	public String getMessage() {
@@ -24,12 +41,12 @@ public class ResponseVO {
 		this.message = message;
 	}
 
-	public List<String> getDetails() {
-		return details;
+	public String getFile() {
+		return file;
 	}
 
-	public void setDetails(List<String> details) {
-		this.details = details;
+	public void setFile(String file) {
+		this.file = file;
 	}
 
 }

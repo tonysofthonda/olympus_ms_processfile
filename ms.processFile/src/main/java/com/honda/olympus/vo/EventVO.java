@@ -52,4 +52,11 @@ public class EventVO {
 		this.file = file;
 	}
 
+	@Override
+	public String toString() {
+		return "EventVO [source=" + source + ", status=" + status + ", msg=" + msg + ", file=" + file + "]";
+	}
+	
+	
+
 }

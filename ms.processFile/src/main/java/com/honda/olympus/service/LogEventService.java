@@ -20,7 +20,7 @@ public class LogEventService {
 
 	public void sendLogEvent(EventVO message) {
 		try {
-			log.info("Calling logEvent service: {}",message.toString());
+			log.debug("Calling logEvent service: {}",message.toString());
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			RestTemplate restTemplate = new RestTemplate();
@@ -30,10 +30,10 @@ public class LogEventService {
 			ResponseEntity<String> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
 					String.class);
 
-			log.info("LogEvent created with Status Code: {}",responseEntity.getStatusCode());
-			log.info("Message: {}",responseEntity.getBody());
+			log.debug("LogEvent created with Status Code: {}",responseEntity.getStatusCode());
+			log.debug("Message: {}",responseEntity.getBody());
 		} catch (Exception e) {
-			log.info("Error calling logEvent service {}",e.getLocalizedMessage());
+			log.info("ProcessFile:: Error calling logEvent service: {} ",message.toString());
 		}
 
 	}

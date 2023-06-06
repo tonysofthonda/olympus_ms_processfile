@@ -13,11 +13,15 @@ import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 
 import com.honda.olympus.exception.FileProcessException;
 import com.honda.olympus.vo.TemplateFieldVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ProcessFileUtils {
 	
 	
@@ -38,7 +42,13 @@ public class ProcessFileUtils {
 	public static JSONObject validateFileTemplate(Integer control) throws FileProcessException {
 
 		try {
-			File file = ResourceUtils.getFile("classpath:processFileTemplate.json");
+			
+			ClassPathResource staticDataResource = new ClassPathResource("processFileTemplate.json");
+			
+			File file = staticDataResource.getFile();
+			log.debug("Resource FileName: {}",staticDataResource.getFilename());
+			
+			//File file = ResourceUtils.getFile("classpath:processFileTemplate.json");
 			InputStream inputStream = new FileInputStream(file);
 			StringBuilder responseStrBuilder = new StringBuilder();
 
@@ -86,6 +96,8 @@ public class ProcessFileUtils {
 
 			return result;
 		} catch (IOException e) {
+			
+			log.info("Error reading or processing: processFileTemplate.json file: {}",e.getMessage());
 			throw new FileProcessException("Error reading or processing: processFileTemplate.json file");
 			
 			

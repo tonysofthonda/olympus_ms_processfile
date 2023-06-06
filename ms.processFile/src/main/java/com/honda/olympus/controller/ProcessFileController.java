@@ -37,7 +37,7 @@ public class ProcessFileController {
 	public ResponseEntity<ResponseVO> processFile(@Valid @RequestBody MessageVO message)
 			throws FileProcessException, IOException {
 
-		log.info("Calling File processing: {}",message.toString());
+		log.debug("Calling File processing: {}",message.toString());
 
 		processFileService.processFile(message);
 

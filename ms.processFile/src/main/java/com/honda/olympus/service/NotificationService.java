@@ -24,7 +24,7 @@ public class NotificationService {
 
 		try {
 
-			log.info("Calling Notification service: {}",message.toString());
+			log.debug("Calling Notification service: {}",message.toString());
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			RestTemplate restTemplate = new RestTemplate();
@@ -34,11 +34,10 @@ public class NotificationService {
 			ResponseEntity<ResponseVO> responseEntity = restTemplate.postForEntity(notificationURI, requestEntity,
 					ResponseVO.class);
 
-			log.info("Notification sent with Status Code: {}",responseEntity.getStatusCode());
-			log.info("Message: {}",responseEntity.getBody().getMessage());
+			log.debug("Notification sent with Status Code: {}",responseEntity.getStatusCode());
+			log.debug("Message: {}",responseEntity.getBody().getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.info("Error calling Notification service");
+			log.info("ProcessFile:: Error calling Notification service due to {}",e.getMessage());
 		}
 
 	}

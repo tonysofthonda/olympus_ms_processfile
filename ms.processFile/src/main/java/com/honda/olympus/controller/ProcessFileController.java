@@ -18,6 +18,7 @@ import com.honda.olympus.service.ProcessFileService;
 import com.honda.olympus.vo.MessageVO;
 import com.honda.olympus.vo.ResponseVO;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,6 +34,7 @@ public class ProcessFileController {
 	@Value("${service.name}")
 	private String serviceName;
 
+	@Operation(summary = "Process the provided file")
 	@PostMapping(value = "/file", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ResponseVO> processFile(@Valid @RequestBody MessageVO message)
 			throws FileProcessException, IOException {

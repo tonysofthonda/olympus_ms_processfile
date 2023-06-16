@@ -26,15 +26,16 @@ import com.honda.olympus.controller.repository.AfeModelRepository;
 import com.honda.olympus.controller.repository.AfeModelTypeRepository;
 import com.honda.olympus.controller.repository.AfeOrdersHistoryRepository;
 import com.honda.olympus.controller.repository.AfeStatusEvRepository;
-import com.honda.olympus.dao.AfeActionEntity;
+import com.honda.olympus.dao.AfeActionEvEntity;
 import com.honda.olympus.dao.AfeFixedOrdersEvEntity;
 import com.honda.olympus.dao.AfeModelColorEntity;
 import com.honda.olympus.dao.AfeModelEntity;
 import com.honda.olympus.dao.AfeModelTypeEntity;
-import com.honda.olympus.dao.AfeOrdersHistoryEntity;
-import com.honda.olympus.dao.AfeStatusEvEntity;
+import com.honda.olympus.dao.AfeOrdersActionHistoryEntity;
+import com.honda.olympus.dao.AfeEventStatusEntity;
 import com.honda.olympus.dao.EventCodeEntity;
 import com.honda.olympus.exception.FileProcessException;
+import com.honda.olympus.utils.FileprocessMessagesHandler;
 import com.honda.olympus.utils.ProcessFileConstants;
 import com.honda.olympus.utils.ProcessFileUtils;
 import com.honda.olympus.vo.EventVO;
@@ -49,6 +50,10 @@ public class ProcessFileService {
 
 	@Autowired
 	LogEventService logEventService;
+	
+	
+	@Autowired
+	FileprocessMessagesHandler fileprocessMessagesHandler;
 
 	@Autowired
 	NotificationService notificationService;
@@ -171,8 +176,7 @@ public class ProcessFileService {
 			});
 
 		} catch (Exception e) {
-			logEventService.sendLogEvent(new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-					"No es posible abrir el archivo: " + ": " + HOME + DELIMITER + fileName, fileName));
+			fileprocessMessagesHandler.createAndLogMessageFileFail(fileName);
 			throw new FileProcessException("No es posible abrir el archivo: " + fileName);
 		}
 
@@ -180,10 +184,7 @@ public class ProcessFileService {
 		for (List<TemplateFieldVO> dataList : dataLines) {
 
 			if (dataList.isEmpty()) {
-				log.debug(
-						"La línea leida no cumple con los requerimientos establecidos: {}", dataList.toString());
-				logEventService.sendLogEvent(new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-						"La línea leida no cumple con los requerimientos establecidos: ", fileName));
+				fileprocessMessagesHandler.createAndLogMessageLineFail(dataList.toString(), fileName);
 
 			} else {
 
@@ -228,7 +229,7 @@ public class ProcessFileService {
 			return;
 		}
 
-		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findAllById(idFixedOrder);
+		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findByRequestId(idFixedOrder);
 		if (!fixedOrders.isEmpty()) {
 			log.debug("ProcessFile:: End first altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
@@ -301,7 +302,7 @@ public class ProcessFileService {
 		// QUERY5
 		String action = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ACTION", fileName);
 
-		List<AfeActionEntity> actions = afeActionRepository.findAllByAction(action);
+		List<AfeActionEvEntity> actions = afeActionRepository.findAllByAction(action);
 		if (actions.isEmpty()) {
 			log.debug("ProcessFile:: End fifth altern flow");
 			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
@@ -321,7 +322,7 @@ public class ProcessFileService {
 		fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-MDL-YR", fileName));
 		fixedOrder.setSellingCode(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-SELLING-SRC-CD", fileName));
 		fixedOrder.setOriginType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORIGIN-TYPE", fileName));
-		fixedOrder.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-CD", fileName));
+		fixedOrder.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName));
 		fixedOrder.setOrderType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORD-TYP-CD", fileName));
 		fixedOrder.setChrgAsct(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
 		fixedOrder.setChrgFcm(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
@@ -395,7 +396,7 @@ public class ProcessFileService {
 		// query.idFixedOrder
 		// QUERY9
 
-		List<AfeStatusEvEntity> statusEv = afeStatusEvRepository.findAllByFixedOrder(idFixedOrder);
+		List<AfeEventStatusEntity> statusEv = afeStatusEvRepository.findAllByFixedOrder(idFixedOrder);
 
 		if (statusEv.isEmpty()) {
 			log.debug("ProcessFile:: End second cancel/change altern flow");
@@ -456,7 +457,7 @@ public class ProcessFileService {
 			fixedOrder.setSellingCode(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-SELLING-SRC-CD", fileName));
 			fixedOrder.setOriginType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORIGIN-TYPE", fileName));
 			fixedOrder
-					.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-CD", fileName));
+					.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName));
 			fixedOrder.setOrderType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORD-TYP-CD", fileName));
 			fixedOrder.setChrgAsct(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
 			fixedOrder.setChrgFcm(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
@@ -486,7 +487,7 @@ public class ProcessFileService {
 		// query.idFixedOrder
 		// QUERY12
 		String actionId = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ACTION", fileName);
-		List<AfeActionEntity> action = afeActionRepository.findAllByAction(actionId);
+		List<AfeActionEvEntity> action = afeActionRepository.findAllByAction(actionId);
 
 		if (action.isEmpty()) {
 
@@ -522,7 +523,7 @@ public class ProcessFileService {
 	private boolean insertOrderHistory(Long actionId, Long fixedOrderId, List<TemplateFieldVO> dataLine,
 			String fileName) {
 
-		AfeOrdersHistoryEntity orderHistory = new AfeOrdersHistoryEntity();
+		AfeOrdersActionHistoryEntity orderHistory = new AfeOrdersActionHistoryEntity();
 		orderHistory.setActionId(actionId);
 		orderHistory.setFixedOrderId(fixedOrderId);
 		orderHistory.setCreationTimeStamp(new Date());

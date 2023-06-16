@@ -12,20 +12,30 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "event_code", schema = "afedb")
-public class EventCodeEntity {
+@Table(name = "afe_event_status_history", schema = "afedb")
+public class AfeEventStatusHistoryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "event_code_number")
-	private Long eventCodeNumber;
+	@Column(name = "afe_Event_Status_Id")
+	private Long afeEventStatusId;
 
-	@Column(name = "description",length = 50)
-	private String description;
-	
+	@Column(name = "event_Status_Id")
+	private Long eventStatusId;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "cur_Evnt_Status_Dt")
+	private Date curEvntStatusDt;
+
+	@Column(name = "cur_Veh_Evnt_Desc", length = 55)
+	private String curVehEvntDesc;
+
+	@Column(name = "envio_Flag_Ah_Event")
+	private Boolean envioFlagAhEvent;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "create_Timestamp")
 	Date creationTimeStamp;
@@ -40,11 +50,9 @@ public class EventCodeEntity {
 	@Column(name = "bstate")
 	private Character bstate;
 
-	
-	public EventCodeEntity() {
+	public AfeEventStatusHistoryEntity() {
 		super();
 	}
-	
 
 	public Long getId() {
 		return id;
@@ -54,20 +62,44 @@ public class EventCodeEntity {
 		this.id = id;
 	}
 
-	public Long getEventCodeNumber() {
-		return eventCodeNumber;
+	public Long getAfeEventStatusId() {
+		return afeEventStatusId;
 	}
 
-	public void setEventCodeNumber(Long eventCodeNumber) {
-		this.eventCodeNumber = eventCodeNumber;
+	public void setAfeEventStatusId(Long afeEventStatusId) {
+		this.afeEventStatusId = afeEventStatusId;
 	}
 
-	public String getDescription() {
-		return description;
+	public Long getEventStatusId() {
+		return eventStatusId;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setEventStatusId(Long eventStatusId) {
+		this.eventStatusId = eventStatusId;
+	}
+
+	public Date getCurEvntStatusDt() {
+		return curEvntStatusDt;
+	}
+
+	public void setCurEvntStatusDt(Date curEvntStatusDt) {
+		this.curEvntStatusDt = curEvntStatusDt;
+	}
+
+	public String getCurVehEvntDesc() {
+		return curVehEvntDesc;
+	}
+
+	public void setCurVehEvntDesc(String curVehEvntDesc) {
+		this.curVehEvntDesc = curVehEvntDesc;
+	}
+
+	public Boolean getEnvioFlagAhEvent() {
+		return envioFlagAhEvent;
+	}
+
+	public void setEnvioFlagAhEvent(Boolean envioFlagAhEvent) {
+		this.envioFlagAhEvent = envioFlagAhEvent;
 	}
 
 	public Date getCreationTimeStamp() {
@@ -101,9 +133,5 @@ public class EventCodeEntity {
 	public void setBstate(Character bstate) {
 		this.bstate = bstate;
 	}
-
-	
-	
-	
 
 }

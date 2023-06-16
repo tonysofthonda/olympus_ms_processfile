@@ -12,19 +12,25 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "event_code", schema = "afedb")
-public class EventCodeEntity {
+@Table(name = "afe_orders_action_history", schema = "afedb")
+public class AfeOrdersActionHistoryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
-
-	@Column(name = "event_code_number")
-	private Long eventCodeNumber;
-
-	@Column(name = "description",length = 50)
-	private String description;
+	
+	@Column(name = "action_Id")
+	private Long actionId;
+	
+	@Column(name = "fixed_Order_Id")
+	private Long fixedOrderId;
+	
+	@Column(name = "model_Color_Id")
+	private Long modelColorId;
+	
+	@Column(name = "envio_Flag_Gm")
+	private Boolean envioFlagGm;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "create_Timestamp")
@@ -33,18 +39,16 @@ public class EventCodeEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "update_Timestamp")
 	Date updateTimeStamp;
-
+	
 	@Column(name = "obs")
 	private String obs;
 
 	@Column(name = "bstate")
 	private Character bstate;
 
-	
-	public EventCodeEntity() {
+	public AfeOrdersActionHistoryEntity() {
 		super();
 	}
-	
 
 	public Long getId() {
 		return id;
@@ -54,20 +58,36 @@ public class EventCodeEntity {
 		this.id = id;
 	}
 
-	public Long getEventCodeNumber() {
-		return eventCodeNumber;
+	public Long getActionId() {
+		return actionId;
 	}
 
-	public void setEventCodeNumber(Long eventCodeNumber) {
-		this.eventCodeNumber = eventCodeNumber;
+	public void setActionId(Long actionId) {
+		this.actionId = actionId;
 	}
 
-	public String getDescription() {
-		return description;
+	public Long getFixedOrderId() {
+		return fixedOrderId;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setFixedOrderId(Long fixedOrderId) {
+		this.fixedOrderId = fixedOrderId;
+	}
+
+	public Long getModelColorId() {
+		return modelColorId;
+	}
+
+	public void setModelColorId(Long modelColorId) {
+		this.modelColorId = modelColorId;
+	}
+
+	public Boolean getEnvioFlagGm() {
+		return envioFlagGm;
+	}
+
+	public void setEnvioFlagGm(Boolean envioFlagGm) {
+		this.envioFlagGm = envioFlagGm;
 	}
 
 	public Date getCreationTimeStamp() {
@@ -104,6 +124,4 @@ public class EventCodeEntity {
 
 	
 	
-	
-
 }

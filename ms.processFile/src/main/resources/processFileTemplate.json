@@ -36,7 +36,7 @@
       "Description": "Tipo de Origen"
     },
     {
-      "field": "GM-ORD-REQ-EXTERN-CONFIG-CD",
+      "field": "GM-ORD-REQ-EXTERN-CONFIG-ID",
       "Spaces": 32,
       "Position_start": 27,
       "Position_end": 58,

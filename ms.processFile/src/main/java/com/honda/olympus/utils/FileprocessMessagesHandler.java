@@ -25,14 +25,18 @@ public class FileprocessMessagesHandler {
 
 	private static final String ERROR_OPENNING_FILE = "No es posible abrir el archivo: %s";
 	private static final String LINE_FAIL = "La línea leida no cumple con los requerimientos establecidos: %s ";
-	private static final String REQUST_IDTFR_VALIDATION = "No se encontró requst_idntfr: %s en la tabla AFE_FIXED_ORDERS_EV";
-	private static final String QUERY_VALIDATION = 	"Fallo en la ejecución del query de inserción en la tabla AFE_FIXED_ORDERS_EV con el query: %s ";
-	private static final String STATUS_VALIDATION = "El reqst_status no es valido: %s";
-	private static final String FIXED_ORDER_NO_EXIST_ACK = "No existe el fixed_order_id: %s en la tabla AFE_ACK_EV";
-	private static final String QUERY_EXECUTION_FAIL = "Fallo en la ejecución del query de actualización en la tabla AFE_FIXED_ORDERS_EV con el query: %s";
-	private static final String NO_CANCEL_FAIL = "La orden: %s tiene un esatus: %s NO es posible cancelarla en la tabla AFE_ACK_EV ";
-	private static final String QUERY_UPDATE_ACK_FAIL = "Fallo en la ejecución del query de actualización en la tabla AFE_ACK_EV con el query: %s";
-	private static final String QUERY_UPDATE_ACTION_FAIL = "No se encontró la acción: %s en la tabla AFE_ACTION  con el query: %s";	
+	private static final String REQUST_ID_EXISTS = "Existe el Id: %s en la tabla afedb.afe_fixed_orders_ev con el query: %s";
+	private static final String EXTERN_REQST_ID = 	"Existe el extern_config_id: %s en la tabla AFE_FIXED_ORDERS_EV con el query: %s ";
+	private static final String ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION con el query: %s";
+	private static final String MODEL_COLOR_NO_EXISTS = "No existe el model_id: %s en la tabla AFE_MODEL_COLOR con el query: %s";
+	private static final String MODEL_NO_EXIST = "No existe el code: %s en la tabla AFE_MODEL con el query: %s";
+	private static final String QUERY_EXECUTION_FAIL = "Fallo en la ejecución del query de inserción en la tabla AFE_FIXED_ORDERS_EV con el query: %s";
+	private static final String QUERY_INSERT_HISTORY_SUCCESS = "Inserción exitosa de la línea: %s en la tabla AFE_ORDER_HISTORY ";
+	private static final String QUERY_NO_EXIST_AFE_FIXED_ORDER = "NO existe el id: %s en la tabla AFE_FIXED_ORDER_EV con el query: %s";
+	private static final String QUERY_ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION  con el query: %s";
+	private static final String QUERY_EVENT_STATUS_NO_EXISTS = "NO tiene status el FIXED_ORDER: %s con el query: %s";
+	
+	
 	private static final String ACTION_SUCCESS = "El proceso fué realizado con éxito para la orden: %s y estatus: %s";
 	private static final String ORDER_HISTORY_FAIL = "Fallo de inserción en la tabla AFE_ORDER_HISOTRY con el query: %s";
 	
@@ -58,28 +62,85 @@ public class FileprocessMessagesHandler {
 		sendAndLog();
 	}
 
-	public void createAndLogMessage(Long rqstIdentifier) {
+	public void createAndLogMessageReqstExist(String requestId,String query) {
 
-		this.message = String.format(REQUST_IDTFR_VALIDATION, rqstIdentifier);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
-	
-	
-	public void createAndLogMessage(String query) {
-
-		this.message = String.format(QUERY_VALIDATION, query);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
+		this.message = String.format(REQUST_ID_EXISTS, requestId, query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
 
 		sendAndLog();
 	}
 	
 	
-	public void createAndLogMessage(MaxTransitResponseVO maxTransitDetail) {
+	public void createAndLogMessageExternCondigId(String externConfigId,String query) {
 
-		this.message = String.format(STATUS_VALIDATION, maxTransitDetail.getReqstStatus());
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
+		this.message = String.format(EXTERN_REQST_ID,  externConfigId,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	
+	public void createAndLogMessageActionNoExist(String action,String query) {
+
+		this.message = String.format(ACTION_NO_EXISTS, action, query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageModelNoExist(String action,String query) {
+
+		this.message = String.format(MODEL_NO_EXIST, action, query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageModelColorNoExist(Long modelId,String query) {
+
+		this.message = String.format(MODEL_COLOR_NO_EXISTS, modelId, query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageInsertFixedorderFailed(String query) {
+
+		this.message = String.format(QUERY_EXECUTION_FAIL, query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageInsertHistorySuccess(String line) {
+
+		this.message = String.format(QUERY_INSERT_HISTORY_SUCCESS, line);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	
+	public void createAndLogMessageNoExistFixedOrder(Long fixedOrderId,String query) {
+
+		this.message = String.format(QUERY_NO_EXIST_AFE_FIXED_ORDER, fixedOrderId,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageActionNoExists(String action,String query) {
+
+		this.message = String.format(QUERY_ACTION_NO_EXISTS,action,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	public void createAndLogMessageNoEventStatusExist(Long fixedOrderId, String query) {
+
+		this.message = String.format(QUERY_EVENT_STATUS_NO_EXISTS,fixedOrderId,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
 
 		sendAndLog();
 	}
@@ -93,62 +154,8 @@ public class FileprocessMessagesHandler {
 		log.debug("{}:: {}",serviceName,successMessage);
 	}
 	
-	public void createAndLogMessageFixedOrderAck(Long fixedOrderId) {
 
-		this.message = String.format(FIXED_ORDER_NO_EXIST_ACK,fixedOrderId);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
 	
-	public void createAndLogMessageQueryFailed(String query) {
-
-		this.message = String.format(QUERY_EXECUTION_FAIL, query);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
-	
-	public void createAndLogMessageNoCancelOrder(Long fixedOrderId) {
-
-		this.message = String.format(NO_CANCEL_FAIL, fixedOrderId,AckgmConstants.FAILED_STATUS);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
-	
-	public void createAndLogMessageAckUpdateFail(String query) {
-
-		this.message = String.format(QUERY_UPDATE_ACK_FAIL, query);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
-	
-	
-	public void createAndLogMessageNoAction(MaxTransitResponseVO maxTransitDetail,String query) {
-
-		this.message = String.format(QUERY_UPDATE_ACTION_FAIL,maxTransitDetail.getAction(),query);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
-	
-	public void createAndLogMessageSuccessAction(MaxTransitResponseVO maxTransitDetail) {
-
-		this.message = String.format(ACTION_SUCCESS,maxTransitDetail.getRqstIdentfr(),maxTransitDetail.getReqstStatus());
-		this.event = new EventVO(serviceName, AckgmConstants.ONE_STATUS, message, "");
-
-		sendAndLog();
-	}
-
-	public void createAndLogMessageOrderHistoryFail(String query) {
-
-		this.message = String.format(ORDER_HISTORY_FAIL,query);
-		this.event = new EventVO(serviceName, AckgmConstants.ZERO_STATUS, message, "");
-
-		sendAndLog();
-	}
 
 	private void sendAndLog() {
 		logEventService.sendLogEvent(this.event);

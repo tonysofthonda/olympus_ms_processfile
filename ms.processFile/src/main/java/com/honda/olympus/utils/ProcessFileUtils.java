@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -152,7 +154,16 @@ public class ProcessFileUtils {
 	public void setTotalEspaces(Integer totalEspaces) {
 		this.totalEspaces = totalEspaces;
 	}
+	 
 	
+	public static String getTimeStamp() {
+		
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		return sdf.format(timestamp);
+	}
 	
 
 }

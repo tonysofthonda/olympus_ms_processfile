@@ -21,7 +21,7 @@ public class AfeModelColorEntity {
 	private Long id;
 
 	@Column(name = "model_id")
-	private Long model_id;
+	private Long modelId;
 
 	@Column(name = "color_id")
 	private Long colorId;
@@ -45,12 +45,12 @@ public class AfeModelColorEntity {
 		this.id = id;
 	}
 
-	public Long getModel_id() {
-		return model_id;
+	public Long getModelId() {
+		return modelId;
 	}
 
-	public void setModel_id(Long model_id) {
-		this.model_id = model_id;
+	public void setModelId(Long modelId) {
+		this.modelId = modelId;
 	}
 
 	public Long getColorId() {

@@ -2,6 +2,7 @@ package com.honda.olympus.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class ProcessFileController {
 
 	@Value("${service.name}")
 	private String serviceName;
+	
+	@Autowired
+	private HttpServletRequest request;
 
 	@Operation(summary = "Process the provided file")
 	@PostMapping(value = "/file", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,6 +44,8 @@ public class ProcessFileController {
 			throws FileProcessException, IOException {
 
 		log.debug("Calling File processing: {}",message.toString());
+		
+		String ipAddress = request.getRemoteAddr();
 
 		processFileService.processFile(message);
 

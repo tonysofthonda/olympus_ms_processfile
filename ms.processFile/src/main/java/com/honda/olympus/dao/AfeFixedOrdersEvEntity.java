@@ -100,4 +100,199 @@ public class AfeFixedOrdersEvEntity {
 	public AfeFixedOrdersEvEntity() {
 	}
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Boolean getEnvioFlagGm() {
+		return envioFlagGm;
+	}
+
+	public void setEnvioFlagGm(Boolean envioFlagGm) {
+		this.envioFlagGm = envioFlagGm;
+	}
+
+	public Long getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(Long actionId) {
+		this.actionId = actionId;
+	}
+
+	public Long getModelColorId() {
+		return modelColorId;
+	}
+
+	public void setModelColorId(Long modelColorId) {
+		this.modelColorId = modelColorId;
+	}
+
+	public String getOrderNumber() {
+		return orderNumber;
+	}
+
+	public void setOrderNumber(String orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+
+	public String getSellingCode() {
+		return sellingCode;
+	}
+
+	public void setSellingCode(String sellingCode) {
+		this.sellingCode = sellingCode;
+	}
+
+	public String getOriginType() {
+		return originType;
+	}
+
+	public void setOriginType(String originType) {
+		this.originType = originType;
+	}
+
+	public String getExternConfigId() {
+		return externConfigId;
+	}
+
+	public void setExternConfigId(String externConfigId) {
+		this.externConfigId = externConfigId;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+
+	public Long getChrgAsct() {
+		return chrgAsct;
+	}
+
+	public void setChrgAsct(Long chrgAsct) {
+		this.chrgAsct = chrgAsct;
+	}
+
+	public Long getChrgFcn() {
+		return chrgFcn;
+	}
+
+	public void setChrgFcn(Long chrgFcn) {
+		this.chrgFcn = chrgFcn;
+	}
+
+	public Long getShipSct() {
+		return shipSct;
+	}
+
+	public void setShipSct(Long shipSct) {
+		this.shipSct = shipSct;
+	}
+
+	public Long getShipFcn() {
+		return shipFcn;
+	}
+
+	public void setShipFcn(Long shipFcn) {
+		this.shipFcn = shipFcn;
+	}
+
+	public String getRequestId() {
+		return requestId;
+	}
+
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+
+	public String getVinNumber() {
+		return vinNumber;
+	}
+
+	public void setVinNumber(String vinNumber) {
+		this.vinNumber = vinNumber;
+	}
+
+	public Date getProdWeekStartDay() {
+		return prodWeekStartDay;
+	}
+
+	public void setProdWeekStartDay(Date prodWeekStartDay) {
+		this.prodWeekStartDay = prodWeekStartDay;
+	}
+
+	public Date getOrdDueDt() {
+		return ordDueDt;
+	}
+
+	public void setOrdDueDt(Date ordDueDt) {
+		this.ordDueDt = ordDueDt;
+	}
+
+	public Date getCreateOrdTimestamp() {
+		return createOrdTimestamp;
+	}
+
+	public void setCreateOrdTimestamp(Date createOrdTimestamp) {
+		this.createOrdTimestamp = createOrdTimestamp;
+	}
+
+	public Date getCancelOrdTimestamp() {
+		return cancelOrdTimestamp;
+	}
+
+	public void setCancelOrdTimestamp(Date cancelOrdTimestamp) {
+		this.cancelOrdTimestamp = cancelOrdTimestamp;
+	}
+
+	public Date getChangeOrdTimestamp() {
+		return changeOrdTimestamp;
+	}
+
+	public void setChangeOrdTimestamp(Date changeOrdTimestamp) {
+		this.changeOrdTimestamp = changeOrdTimestamp;
+	}
+
+	public Date getCreationTimeStamp() {
+		return creationTimeStamp;
+	}
+
+	public void setCreationTimeStamp(Date creationTimeStamp) {
+		this.creationTimeStamp = creationTimeStamp;
+	}
+
+	public Date getUpdateTimeStamp() {
+		return updateTimeStamp;
+	}
+
+	public void setUpdateTimeStamp(Date updateTimeStamp) {
+		this.updateTimeStamp = updateTimeStamp;
+	}
+
+	public String getObs() {
+		return obs;
+	}
+
+	public void setObs(String obs) {
+		this.obs = obs;
+	}
+
+	public Character getBstate() {
+		return bstate;
+	}
+
+	public void setBstate(Character bstate) {
+		this.bstate = bstate;
+	}
+	
+	
+	
+
 }

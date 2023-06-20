@@ -28,13 +28,13 @@ public class ProcessFileController {
 
 	@Autowired
 	ProcessFileService processFileService;
-	
+
 	@Value("${service.success.message}")
 	private String successMessage;
 
 	@Value("${service.name}")
 	private String serviceName;
-	
+
 	@Autowired
 	private HttpServletRequest request;
 
@@ -43,13 +43,14 @@ public class ProcessFileController {
 	public ResponseEntity<ResponseVO> processFile(@Valid @RequestBody MessageVO message)
 			throws FileProcessException, IOException {
 
-		log.debug("Calling File processing: {}",message.toString());
-		
+		log.debug("Calling File processing: {}", message.toString());
+
 		String ipAddress = request.getRemoteAddr();
 
-		processFileService.processFile(message);
+		processFileService.processFile(message, ipAddress);
 
-		return new ResponseEntity<ResponseVO>(new ResponseVO(serviceName,1L,successMessage, message.getFile()), HttpStatus.OK);
+		return new ResponseEntity<ResponseVO>(new ResponseVO(serviceName, 1L, successMessage, message.getFile()),
+				HttpStatus.OK);
 
 	}
 

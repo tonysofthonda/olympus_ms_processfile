@@ -35,10 +35,10 @@ public class FileprocessMessagesHandler {
 	private static final String QUERY_NO_EXIST_AFE_FIXED_ORDER = "NO existe el id: %s en la tabla AFE_FIXED_ORDER_EV con el query: %s";
 	private static final String QUERY_ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION  con el query: %s";
 	private static final String QUERY_EVENT_STATUS_NO_EXISTS = "NO tiene status el FIXED_ORDER: %s con el query: %s";
-	
-	
-	private static final String ACTION_SUCCESS = "El proceso fué realizado con éxito para la orden: %s y estatus: %s";
-	private static final String ORDER_HISTORY_FAIL = "Fallo de inserción en la tabla AFE_ORDER_HISOTRY con el query: %s";
+	private static final String QUERY_EVENT_CODE_NO_EXISTS = "NO existe el event code: %s con el query: %s";
+	private static final String QUERY_EVENT_CODE_NUM_MAJOR = "El event_code_number es mayor o igual a %s event_code_number: %s";
+	private static final String ACTION_SUCCESS = "Inserción exitosa de la línea %s en la tabla AFEfIXED_ORDER_EV y en la tabla AFE_ORDER_HISTORY";
+	private static final String ORDER_HISTORY_FAIL = "Fallo de ejecución en la tabla AFE_ORDER_HISOTRY con el query: %s";
 	
 	
 	
@@ -145,13 +145,38 @@ public class FileprocessMessagesHandler {
 		sendAndLog();
 	}
 	
+	public void createAndLogMessageNoEventCodeExist(Long fixedOrderId, String query) {
 
-	public void successMessage() {
+		this.message = String.format(QUERY_EVENT_CODE_NO_EXISTS,fixedOrderId,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
 	
-		this.event = new EventVO(serviceName, AckgmConstants.ONE_STATUS,successMessage, "");
-		
-		logEventService.sendLogEvent(this.event);
-		log.debug("{}:: {}",serviceName,successMessage);
+	public void createAndLogMessageNoEventCodeMajor(Long eventCodeNumonst, Long eventCodeNum) {
+
+		this.message = String.format(QUERY_EVENT_CODE_NUM_MAJOR,eventCodeNumonst,eventCodeNum);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+
+	public void createAndLogMessageLineInsertFail(String query) {
+
+		this.message = String.format(ORDER_HISTORY_FAIL,query);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
+
+		sendAndLog();
+	}
+	
+	
+
+	public void successMessage(String line) {
+	
+		this.message = String.format(ACTION_SUCCESS,line);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ONE_STATUS, message, "");
+
+		sendAndLog();
 	}
 	
 

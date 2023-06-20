@@ -95,7 +95,7 @@ public class AfeFixedOrdersEvEntity {
 	private String obs;
 
 	@Column(name = "bstate")
-	private Character bstate;
+	private Integer bstate;
 
 	public AfeFixedOrdersEvEntity() {
 	}
@@ -284,15 +284,12 @@ public class AfeFixedOrdersEvEntity {
 		this.obs = obs;
 	}
 
-	public Character getBstate() {
+	public Integer getBstate() {
 		return bstate;
 	}
 
-	public void setBstate(Character bstate) {
+	public void setBstate(Integer bstate) {
 		this.bstate = bstate;
 	}
 	
-	
-	
-
 }

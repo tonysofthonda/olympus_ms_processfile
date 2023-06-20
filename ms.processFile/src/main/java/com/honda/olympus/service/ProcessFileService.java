@@ -88,8 +88,8 @@ public class ProcessFileService {
 	AfeColorRepository afeColorRepository;
 
 	@Autowired
-	AfeModelRepository modelRepository;
-	
+	AfeModelRepository afeModelRepository;
+
 	@Autowired
 	AfeModelColorRepository afeModelColorRepository;
 
@@ -110,13 +110,13 @@ public class ProcessFileService {
 
 	private EventVO event = new EventVO();
 	private JSONObject template;
-	
-	private String ipAddress; 
 
-	public void processFile(final MessageVO message,String ipAddress) throws FileProcessException, IOException {
+	private String ipAddress;
+
+	public void processFile(final MessageVO message, String ipAddress) throws FileProcessException, IOException {
 
 		final Long status = message.getStatus();
-		
+
 		this.ipAddress = ipAddress;
 
 		try {
@@ -206,11 +206,15 @@ public class ProcessFileService {
 						createFlow(dataList, fileName);
 					} else {
 
-						if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CHANGE)
-								|| actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CANCEL)) {
-							cancelChangeFlow(dataList, fileName);
+						if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CHANGE)) {
+							changeFlow(dataList, fileName);
 						} else {
-							log.debug("ProcessFile:: Operation undefied");
+
+							if (actionFlow.get().getValue().equalsIgnoreCase(ProcessFileConstants.CANCEL)) {
+								cancelFlow(dataList, fileName);
+							} else {
+								log.debug("ProcessFile:: Operation undefied");
+							}
 						}
 
 					}
@@ -229,9 +233,9 @@ public class ProcessFileService {
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY1
-		Long idFixedOrder;
+		String idFixedOrder;
 		try {
-			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+			idFixedOrder = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
 		} catch (NumberFormatException e) {
 			return;
 		}
@@ -253,45 +257,45 @@ public class ProcessFileService {
 		externConfigId = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
 
 		fixedOrders = afeFixedOrdersEvRepository.findByExternConfigId(externConfigId);
-		
+
 		if (!fixedOrders.isEmpty()) {
 			log.debug("ProcessFile:: ExternConfigId exists");
-			fileprocessMessagesHandler.createAndLogMessageExternCondigId(externConfigId,"");
+			fileprocessMessagesHandler.createAndLogMessageExternCondigId(externConfigId, "");
 			// return to main line process loop
 			return;
 		}
 
 		// AFE_MODEL
 		// modelColors.mdl_id
-		// QUERY3	
+		// QUERY3
 		String action = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ACTION", fileName);
 
 		List<AfeActionEvEntity> actions = afeActionRepository.findAllByAction(action);
-		if (actions.isEmpty()) {	
+		if (actions.isEmpty()) {
 			log.debug("ProcessFile:: Action no exists");
-			fileprocessMessagesHandler.createAndLogMessageActionNoExist(action,"");
+			fileprocessMessagesHandler.createAndLogMessageActionNoExist(action, "");
 
 			// return to main line process loop
 			return;
 		}
 		Long actionIdQ3 = actions.get(0).getId();
-		
+
 		// AFE_MODEL
-	    // QUERY4
+		// QUERY4
 		String modelCode = getStringValueOfFieldInLine(dataLine, "MDL-ID", fileName);
 
-		List<AfeModelEntity> models = modelRepository.findAllByCode(modelCode);
+		List<AfeModelEntity> models = afeModelRepository.findAllByCode(modelCode);
 		if (models.isEmpty()) {
 			log.debug("ProcessFile:: Model no exists");
 			fileprocessMessagesHandler.createAndLogMessageModelNoExist(modelCode, "");
 			// return to main line process loop
 			return;
 		}
-		
-        Long modelId = models.get(0).getId();
+
+		Long modelId = models.get(0).getId();
 		Long modelTypeId = models.get(0).getModelTypeId();
 		Long plantId = models.get(0).getPlantId();
-		Long modelYear = models.get(0).getModelYear(); 
+		Long modelYear = models.get(0).getModelYear();
 		Long divisionId = models.get(0).getDivisionId();
 
 		// AFE_MODEL_COLOR
@@ -303,9 +307,9 @@ public class ProcessFileService {
 			// return to main line process loop
 			return;
 		}
-		Long  modelIdQ5 = modelColors.get(0).getModelId();
-	
-		//QUERY6
+		Long modelIdQ5 = modelColors.get(0).getModelId();
+
+		// QUERY6
 		AfeFixedOrdersEvEntity fixedOrder = new AfeFixedOrdersEvEntity();
 		fixedOrder.setEnvioFlagGm(Boolean.FALSE);
 		fixedOrder.setActionId(actionIdQ3);
@@ -321,21 +325,21 @@ public class ProcessFileService {
 		fixedOrder.setVinNumber("");
 		fixedOrder.setProdWeekStartDay(getDateValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 		fixedOrder.setOrdDueDt(getDateValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
-		
-		fixedOrder.setObs(String.format("Client IP: %s , TimeStamp: %s", this.ipAddress,ProcessFileUtils.getTimeStamp()));
-		
-		fixedOrder.setBstate('1');
+
+		fixedOrder.setObs(
+				String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
+
+		fixedOrder.setBstate(1);
 
 		try {
-			//QUERY6
-			//QUERY7
+			// QUERY6
+			// QUERY7
 			afeFixedOrdersEvRepository.save(fixedOrder);
 		} catch (Exception e) {
 			log.info("ProcessFile:: End sixth altern flow");
 			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
 		}
 
-		
 		// QUERY8
 		if (!insertOrderHistory(actionIdQ3, fixedOrder.getId(), dataLine, fileName)) {
 			return;
@@ -353,9 +357,9 @@ public class ProcessFileService {
 
 	}
 
-	private void cancelChangeFlow(List<TemplateFieldVO> dataLine, String fileName) {
+	private void changeFlow(List<TemplateFieldVO> dataLine, String fileName) {
 
-		log.debug("ProcessFile:: Start:: CHANGE Flow");
+		log.debug("ProcessFile:: Start:: Change Flow");
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY9
@@ -364,28 +368,30 @@ public class ProcessFileService {
 		try {
 			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
 			externConfigId = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
-			
 
 		} catch (NumberFormatException e) {
 			return;
 		}
 
-		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository.findByRequestAndExternConfigId(externConfigId,idFixedOrder);
+		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository
+				.findByRequestAndExternConfigId(externConfigId, idFixedOrder);
 		if (fixedOrders.isEmpty()) {
-			
-			fileprocessMessagesHandler.createAndLogMessageNoExistFixedOrder(idFixedOrder, "SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER");
+
+			fileprocessMessagesHandler.createAndLogMessageNoExistFixedOrder(idFixedOrder,
+					"SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER");
 
 			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-					String.format("NO Existe el Id: %s en la tabla afedb.AFE_FIXED_ORDERS_EV con el query: %s",idFixedOrder,"SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER")
-					, fileName);
+					String.format("NO Existe el Id: %s en la tabla afedb.AFE_FIXED_ORDERS_EV con el query: %s",
+							idFixedOrder, "SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER"),
+					fileName);
 			notificationService.generatesNotification(messageEvent);
 
 			// return to main line process loop
 			log.debug("ProcessFile:: FixedOrder DOESN'T exist");
 
 		}
-		
-		Long fixedOrderIdQ9 =fixedOrders.get(0).getId();
+
+		Long fixedOrderIdQ9 = fixedOrders.get(0).getId();
 
 		// query.idFixedOrder
 		// QUERY10
@@ -399,7 +405,8 @@ public class ProcessFileService {
 		List<AfeActionEvEntity> actions = afeActionRepository.findAllByAction(ordReqAction);
 
 		if (actions.isEmpty()) {
-			fileprocessMessagesHandler.createAndLogMessageActionNoExists(ordReqAction,"SELECT * FROM AFE_ACTION WHERE ACTION");
+			fileprocessMessagesHandler.createAndLogMessageActionNoExists(ordReqAction,
+					"SELECT * FROM AFE_ACTION WHERE ACTION");
 
 			// return to main line process loop
 			log.debug("AFE_ACTION_EV DOESN'T exist");
@@ -407,21 +414,22 @@ public class ProcessFileService {
 			return;
 
 		}
-		
+
 		Long actionIdQ10 = actions.get(0).getId();
 
 		// query.idFixedOrder
 		// QUERY11
-		List<AfeEventStatusEntity> eventCode = afeEventStatusRepository.findAllByFixedOrder(fixedOrderIdQ9);
+		List<AfeEventStatusEntity> eventStatus = afeEventStatusRepository.findAllByFixedOrder(fixedOrderIdQ9);
 
-		if (eventCode.isEmpty()) {
-			fileprocessMessagesHandler.createAndLogMessageNoEventStatusExist(fixedOrderIdQ9,"SELECT * FROM EVENT_STATUS WHERE FIXED_ORDER_ID");
+		if (eventStatus.isEmpty()) {
+			fileprocessMessagesHandler.createAndLogMessageNoEventStatusExist(fixedOrderIdQ9,
+					"SELECT * FROM EVENT_STATUS WHERE FIXED_ORDER_ID");
 
 			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-					String.format("NO tiene status el FIXED_ORDER: %s con el query: %s",fixedOrderIdQ9,"SELECT * FROM EVENT_STATUS WHERE FIXED_ORDER_ID")
-					, fileName);
+					String.format("NO tiene status el FIXED_ORDER: %s con el query: %s", fixedOrderIdQ9,
+							"SELECT * FROM EVENT_STATUS WHERE FIXED_ORDER_ID"),
+					fileName);
 			notificationService.generatesNotification(messageEvent);
-			
 			// return to main line process loop
 			log.debug("ProcessFile:: FixedOrder DOESN'T exist in EVENT_STATUS");
 
@@ -429,50 +437,94 @@ public class ProcessFileService {
 
 		}
 
-		if (eventCode.get(0).getEventCodeNumber() >= ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER) {
+		Long eventCodeIdQ11 = eventStatus.get(0).getEventCodeId();
 
-			log.debug("ProcessFile:: End fourth cancel/change altern flow,event_code_number < {} ",
-					ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER);
-			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-					"El event_code_number es mayor o igual a 2500, event_code_number :"
-							+ eventCode.get(0).getEventCodeNumber(),
+		// QUERY12
+		List<EventCodeEntity> eventCodes = afeEventCodeRepository.findAllByEventCode(eventCodeIdQ11);
+
+		if (eventCodes.isEmpty()) {
+			fileprocessMessagesHandler.createAndLogMessageNoEventCodeExist(eventCodeIdQ11,
+					"SELECT * FROM EVENT_CODE WHERE EVENT_CODE_ID");
+
+			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					String.format("NO existe el event code: %s con el query: %s", fixedOrderIdQ9,
+							"SELECT * FROM EVENT_CODE WHERE EVENT_CODE_ID"),
 					fileName);
-			logEventService.sendLogEvent(event);
+			notificationService.generatesNotification(messageEvent);
+			// return to main line process loop
+			log.debug("ProcessFile:: FixedOrder DOESN'T exist in EVENT_CODE");
+
+			return;
+
+		}
+
+		Long eventCodeNumberQ12 = eventCodes.get(0).getEventCodeNumber();
+
+		if (eventCodeNumberQ12 >= ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER) {
+
+			fileprocessMessagesHandler.createAndLogMessageNoEventCodeMajor(
+					ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER, eventCodeNumberQ12);
 
 			// return to main line process loop
-			log.debug("ProcessFile:: El event_code_number es mayor o igual a 2500, " + " event_coe_number: {} ",
-					eventCode.get(0).getEventCodeNumber());
+			log.debug("ProcessFile:: El event_code_number es mayor o igual a {} ,event_coe_number: {} ",
+					ProcessFileConstants.MAX_CANCEL_EVENT_CODE_NUMBER, eventCodeNumberQ12);
 
 			return;
 		}
 
-		// query.idFixedOrder
-		// QUERY11
+		// QUERY13
+		String modelCode = getStringValueOfFieldInLine(dataLine, "MDL-ID", fileName);
+
+		List<AfeModelEntity> models = afeModelRepository.findAllByCode(modelCode);
+		if (models.isEmpty()) {
+			log.debug("ProcessFile:: Model no exists");
+			fileprocessMessagesHandler.createAndLogMessageModelNoExist(modelCode, "");
+			// return to main line process loop
+			return;
+		}
+
+		Long modelId = models.get(0).getId();
+		Long modelTypeId = models.get(0).getModelTypeId();
+		Long plantId = models.get(0).getPlantId();
+		Long modelYear = models.get(0).getModelYear();
+		Long divisionId = models.get(0).getDivisionId();
+
+		// AFE_MODEL_COLOR
+		// QUERY14
+		List<AfeModelColorEntity> modelColors = afeModelColorRepository.findAllByModelId(modelId);
+		if (modelColors.isEmpty()) {
+			log.debug("ProcessFile:: ModelColor no exists");
+			fileprocessMessagesHandler.createAndLogMessageModelColorNoExist(modelId, "");
+			// return to main line process loop
+			return;
+		}
+		Long modelIdQ14 = modelColors.get(0).getModelId();
 
 		try {
+			// QUERY15
 			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.getById(idFixedOrder);
 
-			fixedOrder.setEnvioFlag(Boolean.TRUE);
+			fixedOrder.setEnvioFlagGm(Boolean.FALSE);
+			fixedOrder.setActionId(actionIdQ10);
+			fixedOrder.setModelColorId(modelIdQ14);
 			fixedOrder.setOrderNumber(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-VEH-ORD-NO", fileName));
-			fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-MDL-YR", fileName));
-			fixedOrder.setSellingCode(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-SELLING-SRC-CD", fileName));
+			fixedOrder.setSellingCode("");
 			fixedOrder.setOriginType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORIGIN-TYPE", fileName));
 			fixedOrder
 					.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName));
 			fixedOrder.setOrderType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORD-TYP-CD", fileName));
-			fixedOrder.setChrgAsct(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
-			fixedOrder.setChrgFcm(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
-			fixedOrder.setShipSct(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
-			fixedOrder.setShipFcm(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
-			fixedOrder.setRequestId(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName));
-
-			fixedOrder.setStartDay(getStringValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
-			fixedOrder.setDueDate(getStringValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
-			fixedOrder.setModelColorId(getLongValueOfFieldInLine(dataLine, "MDL-ID", fileName));
-			fixedOrder.setUpdateTimeStamp(new Date());
+			fixedOrder.setChrgAsct(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
+			fixedOrder.setChrgFcn(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
+			fixedOrder.setRequestId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName));
+			fixedOrder.setVinNumber("");
+			fixedOrder.setProdWeekStartDay(getDateValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
+			fixedOrder.setOrdDueDt(getDateValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
+			fixedOrder.setChangeOrdTimestamp(new Date());
+			fixedOrder.setObs(
+					String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
+			fixedOrder.setBstate(1);
 
 			afeFixedOrdersEvRepository.saveAndFlush(fixedOrder);
-
 		} catch (EntityNotFoundException e) {
 
 			log.info("ProcessFile:: Error updating AFE_FIXED_ORDERS_EV");
@@ -485,39 +537,104 @@ public class ProcessFileService {
 			return;
 		}
 
-		// query.idFixedOrder
-		// QUERY12
-		String actionId = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ACTION", fileName);
-		List<AfeActionEvEntity> action = afeActionRepository.findAllByAction(actionId);
-
-		if (action.isEmpty()) {
-
-			log.debug("ProcessFile:: AFE_ACTION DOESN'T exist");
-			log.debug("ProcessFile:: End third cancel/change altern flow");
-			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
-					"NO Existe la acción " + actionId + " en la tabla AFE_ACTION con el query: ", fileName);
-			logEventService.sendLogEvent(event);
-
-			return;
-
-		}
-
-		// query.idFixedOrder
-		// QUERY13
-		if (!insertOrderHistory(action.get(0).getId(), idFixedOrder, dataLine, fileName)) {
+		// QUERY16
+		if (!insertOrderHistory(actionIdQ10, fixedOrderIdQ9, dataLine, fileName)) {
 			return;
 		}
 
 		String successMessage = "Actualización exitosa de la línea:\n" + dataLine.get(0).lineNumber + "\n Tokens: \n"
 				+ dataLine.toString() + "\n en la tabla AFE_FIXED_ORDERS_EV y en la tabla AFE_ORDERS_HISTORY";
 
-		event = new EventVO(serviceName, ProcessFileConstants.ONE_STATUS, successMessage, fileName);
-		logEventService.sendLogEvent(event);
+		fileprocessMessagesHandler.successMessage(dataLine.toString());
 
 		MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS, successMessage, fileName);
 		notificationService.generatesNotification(messageEvent);
 
-		log.debug("ProcessFile:: End:: Cancel/Change Flow");
+		log.debug("ProcessFile:: End:: Change Flow");
+
+	}
+
+	private void cancelFlow(List<TemplateFieldVO> dataLine, String fileName) {
+		log.debug("ProcessFile:: Start:: Cancel Flow");
+
+		// QUERY17
+		Long idFixedOrder;
+		Long externConfigId;
+		try {
+			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+			externConfigId = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
+
+		} catch (NumberFormatException e) {
+			return;
+		}
+
+		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository
+				.findByRequestAndExternConfigId(externConfigId, idFixedOrder);
+
+		if (fixedOrders.isEmpty()) {
+
+			fileprocessMessagesHandler.createAndLogMessageNoExistFixedOrder(idFixedOrder,
+					"SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER");
+
+			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					String.format("NO Existe el Id: %s en la tabla afedb.AFE_FIXED_ORDERS_EV con el query: %s",
+							idFixedOrder, "SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER"),
+					fileName);
+			notificationService.generatesNotification(messageEvent);
+
+			// return to main line process loop
+			log.debug("ProcessFile:: FixedOrder DOESN'T exist");
+
+		}
+
+		// QUERY18
+		String ordReqAction;
+		try {
+			ordReqAction = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ACTION", fileName);
+		} catch (NumberFormatException e) {
+			return;
+		}
+
+		List<AfeActionEvEntity> actions = afeActionRepository.findAllByAction(ordReqAction);
+
+		if (actions.isEmpty()) {
+			fileprocessMessagesHandler.createAndLogMessageActionNoExists(ordReqAction,
+					"SELECT * FROM AFE_ACTION WHERE ACTION");
+
+			// return to main line process loop
+			log.debug("AFE_ACTION_EV DOESN'T exist");
+
+			return;
+
+		}
+		
+		Long idActionQ18 = actions.get(0).getId();
+		
+		
+		try {
+			// QUERY15
+			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.getById(idFixedOrder);
+
+			fixedOrder.setEnvioFlagGm(Boolean.TRUE);
+			fixedOrder.setActionId(idActionQ18);
+			fixedOrder.setSellingCode("");
+			fixedOrder.setCancelOrdTimestamp(new Date());
+			fixedOrder.setObs(
+					String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
+			fixedOrder.setBstate(1);
+
+			afeFixedOrdersEvRepository.saveAndFlush(fixedOrder);
+		} catch (EntityNotFoundException e) {
+
+			log.info("ProcessFile:: Error updating AFE_FIXED_ORDERS_EV");
+			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					"Fallo en la ejecuación del query de actualización en la tabla AFE_FIXED_ORDERS_EV con el query ",
+					fileName);
+			logEventService.sendLogEvent(event);
+
+		} catch (NumberFormatException e) {
+			return;
+		}
 
 	}
 
@@ -527,19 +644,21 @@ public class ProcessFileService {
 		AfeOrdersActionHistoryEntity orderHistory = new AfeOrdersActionHistoryEntity();
 		orderHistory.setActionId(actionId);
 		orderHistory.setFixedOrderId(fixedOrderId);
+		orderHistory.setEnvioFlagGm(Boolean.FALSE);
 		orderHistory.setCreationTimeStamp(new Date());
+		orderHistory.setObs(
+				String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
+		orderHistory.setBstate(1);
+
 		try {
 			afeOrdersHistoryRepository.save(orderHistory);
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			log.info("ProcessFile:: Error inserting afedb.afe_fixed_orders_ev");
-			event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, "No se inserto correctamente la linea: "
-					+ dataLine.get(0).lineNumber + " en la tabla afedb.afe_orders_history", fileName);
-			logEventService.sendLogEvent(event);
 
-			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS,
-					"No se inserto correctamente la linea: " + dataLine.get(0).lineNumber
-							+ " en la tabla afedb.afe_orders_history",
+			fileprocessMessagesHandler.createAndLogMessageLineInsertFail("INSERT INTO AFE_ORDER_HISTORY");
+
+			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
+					"Fallo de ejecución del query de inserción en la tabla AFE_ORDER_HISOTRY con el query: INSERT INTO AFE_ORDER_HISTORY",
 					fileName);
 			notificationService.generatesNotification(messageEvent);
 			return Boolean.FALSE;
@@ -599,8 +718,7 @@ public class ProcessFileService {
 		return longValue;
 
 	}
-	
-	
+
 	private Date getDateValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) {
 
 		Optional<TemplateFieldVO> templateField = ProcessFileUtils.getLineValueOfField(dataLine, fieldName);
@@ -609,9 +727,9 @@ public class ProcessFileService {
 		if (templateField.isPresent()) {
 			try {
 				longValue = templateField.get().getValue();
-				
-				Date  date= new SimpleDateFormat("dd/MM/yyyy").parse(longValue);  
-				return date;
+
+				return new SimpleDateFormat("dd/MM/yyyy").parse(longValue);
+	
 			} catch (Exception e) {
 
 				log.debug(
@@ -627,8 +745,7 @@ public class ProcessFileService {
 
 		}
 
-		return longValue;
-
+		return null;
 	}
 
 }

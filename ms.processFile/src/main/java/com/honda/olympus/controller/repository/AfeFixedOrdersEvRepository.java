@@ -22,6 +22,6 @@ public interface AfeFixedOrdersEvRepository extends JpaRepository<AfeFixedOrders
 	
 	//QUERY9
 	@Query("SELECT o FROM AfeFixedOrdersEvEntity o WHERE  o.requestId = :requestId AND o.externConfigId = :externConfigId ")
-	List<AfeFixedOrdersEvEntity> findByRequestAndExternConfigId(@Param("externConfigId") String externConfigId,
-			@Param("requestId") String requestId);
+	List<AfeFixedOrdersEvEntity> findByRequestAndExternConfigId(@Param("externConfigId") Long externConfigId,
+			@Param("requestId") Long requestId);
 }

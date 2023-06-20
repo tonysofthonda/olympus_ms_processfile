@@ -12,7 +12,7 @@ import com.honda.olympus.dao.EventCodeEntity;
 @Repository
 public interface AfeEventCodeRepository extends JpaRepository<EventCodeEntity, Long> {
 
-	// QUERY10
+	// QUERY12
 	@Query("SELECT o FROM EventCodeEntity o WHERE o.id = :eventCodeId ")
 	public List<EventCodeEntity> findAllByEventCode(@Param("eventCodeId") Long eventCodeId);
 }

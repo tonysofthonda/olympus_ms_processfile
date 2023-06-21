@@ -52,4 +52,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler{
 		
 		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(NumberFormatException.class)
+	public final ResponseEntity<Object> handlefileNumberFormatException(Exception ex, WebRequest request){
+		
+		List<String> details = new ArrayList<>();
+		
+		details.add(ex.getLocalizedMessage());
+		ResponseVO error = new ResponseVO(serviceName,0L,ex.getLocalizedMessage(), "");
+		
+		return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+	}
 }

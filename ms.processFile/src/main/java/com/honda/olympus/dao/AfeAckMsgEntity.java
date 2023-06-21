@@ -17,41 +17,41 @@ public class AfeAckMsgEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
+	@Column(name = "\"id\"")
 	private Long id;
 
-	@Column(name = "afe_Order_Action_History_Id")
+	@Column(name = "\"afe_Order_Action_History_Id\"")
 	private Long afeOrderActionHistoryId;
 
-	@Column(name = "ack_Status", length = 8)
+	@Column(name = "\"ack_Status\"", length = 8)
 	private String ackStatus;
 
-	@Column(name = "ack_Message", length = 300)
+	@Column(name = "\"ack_Message\"", length = 300)
 	private String ackMesage;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "last_Change_Timestamp")
+	@Column(name = "\"last_Change_Timestamp\"")
 	Date lastChangeTimestamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "create_Ack_Timestamp")
+	@Column(name = "\"create_Ack_Timestamp\"")
 	Date createAckTimestamp;
 
-	@Column(name = "envio_Flag_Ah_Ack")
+	@Column(name = "\"envio_Flag_Ah_Ack\"")
 	private Boolean envioFlagAhAck;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "createTimestamp")
+	@Column(name = "\"createTimestamp\"")
 	Date creationTimeStamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "updateTimestamp")
+	@Column(name = "\"update_timestamp\"")
 	Date updateTimeStamp;
 
-	@Column(name = "obs")
+	@Column(name = "\"obs\"")
 	private String obs;
 
-	@Column(name = "bstate")
+	@Column(name = "\"bstate\"")
 	private Character bstate;
 
 	public AfeAckMsgEntity() {

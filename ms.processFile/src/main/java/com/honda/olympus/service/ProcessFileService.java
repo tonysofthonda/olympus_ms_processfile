@@ -173,13 +173,8 @@ public class ProcessFileService {
 			input.forEach(line -> {
 				log.debug("Line: {}", line);
 				log.debug("Line lenght: {}", line.length());
-
-				if (line.length() == lineSize) {
-					dataLines.add(ProcessFileUtils.readProcessFileTemplate(template, line));
-				} else {
-					dataLines.add(new ArrayList<>());
-				}
-
+				dataLines.add(ProcessFileUtils.readProcessFileTemplate(template, line));
+				
 			});
 
 		} catch (Exception e) {
@@ -190,7 +185,8 @@ public class ProcessFileService {
 		// Main reading lines loop
 		for (List<TemplateFieldVO> dataList : dataLines) {
 
-			if (dataList.isEmpty()) {
+			
+			if (dataList.get(0).lineNumber.length() != lineSize) {
 				fileprocessMessagesHandler.createAndLogMessageLineFail(dataList.toString(), fileName);
 
 			} else {
@@ -311,6 +307,8 @@ public class ProcessFileService {
 
 		// QUERY6
 		AfeFixedOrdersEvEntity fixedOrder = new AfeFixedOrdersEvEntity();
+		
+		try {
 		fixedOrder.setEnvioFlagGm(Boolean.FALSE);
 		fixedOrder.setActionId(actionIdQ3);
 		fixedOrder.setModelColorId(modelIdQ5);
@@ -330,7 +328,11 @@ public class ProcessFileService {
 				String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
 
 		fixedOrder.setBstate(1);
-
+		}catch(NumberFormatException nfe){
+			log.info("Exception inserting data due to: {} ",nfe.getLocalizedMessage());
+			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
+			throw new FileProcessException("Data format error in processed file");
+		}
 		try {
 			// QUERY6
 			// QUERY7

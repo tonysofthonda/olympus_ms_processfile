@@ -17,45 +17,45 @@ public class AfeEventStatusEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
+	@Column(name = "\"id\"")
 	private Long id;
 	
-	@Column(name = "fixed_order_id")
+	@Column(name = "\"fixed_Order_Id\"")
 	private Long fixedOrderId;
 
-	@Column(name = "extern_Config_Types", length = 50)
+	@Column(name = "\"extern_Config_Types\"", length = 50)
 	private String externConfigTypes;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "vo_Last_Chg_Timstm")
+	@Column(name = "\"vo_Last_Chg_Timstm\"")
 	private Date voLastChgTimstm;
 
-	@Column(name = "peg_Option")
+	@Column(name = "\"peg_Option\"")
 	private String pegOption;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "target_Prodn_Dt")
+	@Column(name = "\"target_Prodn_Dt\"")
 	private Date targetProdnDt;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "estd_Delvry_Dt")
+	@Column(name = "\"estd_Delvry_Dt\"")
 	private Date estdDelvryDt;
 	
-	@Column(name = "event_Code_Id")
+	@Column(name = "\"event_Code_Id\"")
 	private Long eventCodeId;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "create_Timestamp")
+	@Column(name = "\"create_Timestamp\"")
 	Date creationTimeStamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "update_Timestamp")
+	@Column(name = "\"update_timestamp\"")
 	Date updateTimeStamp;
 
-	@Column(name = "obs")
+	@Column(name = "\"obs\"")
 	private String obs;
 
-	@Column(name = "bstate")
+	@Column(name = "\"bstate\"")
 	private Character bstate;
 	
 	

@@ -17,37 +17,37 @@ public class AfeEventStatusHistoryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
+	@Column(name = "\"id\"")
 	private Long id;
 
-	@Column(name = "afe_Event_Status_Id")
+	@Column(name = "\"afe_Event_Status_Id\"")
 	private Long afeEventStatusId;
 
-	@Column(name = "event_Status_Id")
+	@Column(name = "\"event_Status_Id\"")
 	private Long eventStatusId;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "cur_Evnt_Status_Dt")
+	@Column(name = "\"cur_Evnt_Status_Dt\"")
 	private Date curEvntStatusDt;
 
-	@Column(name = "cur_Veh_Evnt_Desc", length = 55)
+	@Column(name = "\"cur_Veh_Evnt_Desc\"", length = 55)
 	private String curVehEvntDesc;
 
-	@Column(name = "envio_Flag_Ah_Event")
+	@Column(name = "\"envio_Flag_Ah_Event\"")
 	private Boolean envioFlagAhEvent;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "create_Timestamp")
+	@Column(name = "\"create_Timestamp\"")
 	Date creationTimeStamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "update_Timestamp")
+	@Column(name = "\"update_timestamp\"")
 	Date updateTimeStamp;
 
-	@Column(name = "obs")
+	@Column(name = "\"obs\"")
 	private String obs;
 
-	@Column(name = "bstate")
+	@Column(name = "\"bstate\"")
 	private Character bstate;
 
 	public AfeEventStatusHistoryEntity() {

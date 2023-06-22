@@ -121,7 +121,7 @@ public class FileprocessMessagesHandler {
 	}
 	
 	
-	public void createAndLogMessageNoExistFixedOrder(Long fixedOrderId,String query) {
+	public void createAndLogMessageNoExistFixedOrder(String fixedOrderId,String query) {
 
 		this.message = String.format(QUERY_NO_EXIST_AFE_FIXED_ORDER, fixedOrderId,query);
 		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -288,7 +289,7 @@ public class ProcessFileService {
 			return;
 		}
 
-		Long modelId = models.get(0).getId();
+		Long modelIdQ4 = models.get(0).getId();
 		Long modelTypeId = models.get(0).getModelTypeId();
 		Long plantId = models.get(0).getPlantId();
 		Long modelYear = models.get(0).getModelYear();
@@ -296,10 +297,10 @@ public class ProcessFileService {
 
 		// AFE_MODEL_COLOR
 		// QUERY5
-		List<AfeModelColorEntity> modelColors = afeModelColorRepository.findAllByModelId(modelId);
+		List<AfeModelColorEntity> modelColors = afeModelColorRepository.findAllByModelId(modelIdQ4);
 		if (modelColors.isEmpty()) {
 			log.debug("ProcessFile:: ModelColor no exists");
-			fileprocessMessagesHandler.createAndLogMessageModelColorNoExist(modelId, "");
+			fileprocessMessagesHandler.createAndLogMessageModelColorNoExist(modelIdQ4, "");
 			// return to main line process loop
 			return;
 		}
@@ -324,14 +325,17 @@ public class ProcessFileService {
 		fixedOrder.setProdWeekStartDay(getDateValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 		fixedOrder.setOrdDueDt(getDateValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
 
+		fixedOrder.setCreateOrdTimestamp(new Date());
+		fixedOrder.setCreationTimeStamp(new Date());
+		
 		fixedOrder.setObs(
 				String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
 
 		fixedOrder.setBstate(1);
-		}catch(NumberFormatException nfe){
+		}catch(NumberFormatException | ParseException nfe){
 			log.info("Exception inserting data due to: {} ",nfe.getLocalizedMessage());
 			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
-			throw new FileProcessException("Data format error in processed file");
+			return;
 		}
 		try {
 			// QUERY6
@@ -340,6 +344,7 @@ public class ProcessFileService {
 		} catch (Exception e) {
 			log.info("ProcessFile:: End sixth altern flow");
 			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
+			return;
 		}
 
 		// QUERY8
@@ -365,26 +370,26 @@ public class ProcessFileService {
 
 		// linea.GM-ORD-REQ-REQST-ID
 		// QUERY9
-		Long idFixedOrder;
-		Long externConfigId;
+		String requestIdQ9;
+		String externConfigIdQ9;
 		try {
-			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
-			externConfigId = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
+			requestIdQ9 = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+			externConfigIdQ9 = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
 
 		} catch (NumberFormatException e) {
 			return;
 		}
 
 		List<AfeFixedOrdersEvEntity> fixedOrders = afeFixedOrdersEvRepository
-				.findByRequestAndExternConfigId(externConfigId, idFixedOrder);
+				.findByRequestAndExternConfigId(externConfigIdQ9, requestIdQ9);
 		if (fixedOrders.isEmpty()) {
 
-			fileprocessMessagesHandler.createAndLogMessageNoExistFixedOrder(idFixedOrder,
+			fileprocessMessagesHandler.createAndLogMessageNoExistFixedOrder(requestIdQ9,
 					"SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER");
 
 			MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,
 					String.format("NO Existe el Id: %s en la tabla afedb.AFE_FIXED_ORDERS_EV con el query: %s",
-							idFixedOrder, "SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER"),
+							requestIdQ9, "SELECT * FROM FIXED_ORDERS_EV WHERE EXTERN_CONFIG_ID AND ID_FIXED_ORDER"),
 					fileName);
 			notificationService.generatesNotification(messageEvent);
 
@@ -504,7 +509,7 @@ public class ProcessFileService {
 
 		try {
 			// QUERY15
-			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.getById(idFixedOrder);
+			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.findFixedOrderById(fixedOrderIdQ9);
 
 			fixedOrder.setEnvioFlagGm(Boolean.FALSE);
 			fixedOrder.setActionId(actionIdQ10);
@@ -522,6 +527,7 @@ public class ProcessFileService {
 			fixedOrder.setProdWeekStartDay(getDateValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 			fixedOrder.setOrdDueDt(getDateValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
 			fixedOrder.setChangeOrdTimestamp(new Date());
+			fixedOrder.setUpdateTimeStamp(new Date());
 			fixedOrder.setObs(
 					String.format("Client IP: %s , TimeStamp: %s", this.ipAddress, ProcessFileUtils.getTimeStamp()));
 			fixedOrder.setBstate(1);
@@ -535,7 +541,7 @@ public class ProcessFileService {
 					fileName);
 			logEventService.sendLogEvent(event);
 
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | ParseException e) {
 			return;
 		}
 
@@ -560,11 +566,11 @@ public class ProcessFileService {
 		log.debug("ProcessFile:: Start:: Cancel Flow");
 
 		// QUERY17
-		Long idFixedOrder;
-		Long externConfigId;
+		String idFixedOrder;
+		String externConfigId;
 		try {
-			idFixedOrder = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
-			externConfigId = getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
+			idFixedOrder = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName);
+			externConfigId = getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName);
 
 		} catch (NumberFormatException e) {
 			return;
@@ -588,6 +594,8 @@ public class ProcessFileService {
 			log.debug("ProcessFile:: FixedOrder DOESN'T exist");
 
 		}
+		
+		Long fixedOrderIdQ17 = fixedOrders.get(0).getId();
 
 		// QUERY18
 		String ordReqAction;
@@ -612,11 +620,13 @@ public class ProcessFileService {
 		
 		Long idActionQ18 = actions.get(0).getId();
 		
-		
+		Long fixedOrderIdQ19 = null;
 		try {
-			// QUERY15
-			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.getById(idFixedOrder);
+			// QUERY19
+			AfeFixedOrdersEvEntity fixedOrder = afeFixedOrdersEvRepository.findFixedOrderById(fixedOrderIdQ17);
 
+			fixedOrderIdQ19 = fixedOrder.getId();
+			
 			fixedOrder.setEnvioFlagGm(Boolean.TRUE);
 			fixedOrder.setActionId(idActionQ18);
 			fixedOrder.setSellingCode("");
@@ -637,6 +647,21 @@ public class ProcessFileService {
 		} catch (NumberFormatException e) {
 			return;
 		}
+		
+		
+		
+		//QUERY20
+		if (!insertOrderHistory(idActionQ18, fixedOrderIdQ19, dataLine, fileName)) {
+			return;
+		}
+		
+		String successMessage = "Inserción exitosa de la línea:\n" + dataLine.get(0).lineNumber + "\n Tokens: \n"
+				+ dataLine.toString() + "\n en la tabla AFE_FIXED_ORDERS_EV y en la tabla AFE_ORDERS_HISTORY";
+
+		fileprocessMessagesHandler.successMessage(dataLine.toString());
+
+		MessageVO messageEvent = new MessageVO(serviceName, ProcessFileConstants.ONE_STATUS, successMessage, fileName);
+		notificationService.generatesNotification(messageEvent);
 
 	}
 
@@ -721,28 +746,27 @@ public class ProcessFileService {
 
 	}
 
-	private Date getDateValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) {
+	private Date getDateValueOfFieldInLine(List<TemplateFieldVO> dataLine, String fieldName, String fileName) throws ParseException{
 
 		Optional<TemplateFieldVO> templateField = ProcessFileUtils.getLineValueOfField(dataLine, fieldName);
 
-		String longValue = null;
+		String strDate = null;
 		if (templateField.isPresent()) {
 			try {
-				longValue = templateField.get().getValue();
+				strDate = templateField.get().getValue();
 
-				return new SimpleDateFormat("dd/MM/yyyy").parse(longValue);
+				return new SimpleDateFormat("dd/MM/yyyy").parse(strDate);
 	
-			} catch (Exception e) {
-
+			} catch (ParseException ep) {
 				log.debug(
-						"ProcessFile::  La línea leida no cumple con los requerimientos establecidos: format exception: {}",
+						"ProcessFile::  La línea leida no cumple con los requerimientos establecidos due to:{}  date format exception for: {}",ep.getLocalizedMessage(),
 						templateField.get().getValue());
 				logEventService.sendLogEvent(new EventVO("ms.profile", ProcessFileConstants.ZERO_STATUS,
 						"La línea leida no cumple con los requerimientos establecidos: format exception: "
 								+ templateField.get().getValue(),
 						fileName));
 
-				return null;
+				 throw ep;
 			}
 
 		}

@@ -20,18 +20,18 @@ public class EventCodeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "event_code_number")
+	@Column(name = "\"event_Code_Number\"")
 	private Long eventCodeNumber;
 
 	@Column(name = "description",length = 50)
 	private String description;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "create_Timestamp")
+	@Column(name = "\"create_Timestamp\"")
 	Date creationTimeStamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "update_Timestamp")
+	@Column(name = "\"update_timestamp\"")
 	Date updateTimeStamp;
 
 	@Column(name = "obs")

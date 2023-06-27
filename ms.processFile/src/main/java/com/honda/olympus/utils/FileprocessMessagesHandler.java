@@ -30,7 +30,7 @@ public class FileprocessMessagesHandler {
 	private static final String ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION con el query: %s";
 	private static final String MODEL_COLOR_NO_EXISTS = "No existe el model_id: %s en la tabla AFE_MODEL_COLOR con el query: %s";
 	private static final String MODEL_NO_EXIST = "No existe el code: %s en la tabla AFE_MODEL con el query: %s";
-	private static final String QUERY_EXECUTION_FAIL = "Fallo en la ejecución del query de inserción en la tabla AFE_FIXED_ORDERS_EV con el query: %s";
+	private static final String QUERY_EXECUTION_FAIL = "Fallo en la ejecución del query de inserción en la tabla AFE_FIXED_ORDERS_EV con el query: %s, Due to: %s";
 	private static final String QUERY_INSERT_HISTORY_SUCCESS = "Inserción exitosa de la línea: %s en la tabla AFE_ORDER_HISTORY ";
 	private static final String QUERY_NO_EXIST_AFE_FIXED_ORDER = "NO existe el id: %s en la tabla AFE_FIXED_ORDER_EV con el query: %s";
 	private static final String QUERY_ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION  con el query: %s";
@@ -104,9 +104,9 @@ public class FileprocessMessagesHandler {
 		sendAndLog();
 	}
 	
-	public void createAndLogMessageInsertFixedorderFailed(String query) {
+	public void createAndLogMessageInsertFixedorderFailed(String query,String cause) {
 
-		this.message = String.format(QUERY_EXECUTION_FAIL, query);
+		this.message = String.format(QUERY_EXECUTION_FAIL, query,cause);
 		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
 
 		sendAndLog();

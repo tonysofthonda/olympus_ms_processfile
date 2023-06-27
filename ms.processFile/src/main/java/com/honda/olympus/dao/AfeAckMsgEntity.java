@@ -26,7 +26,7 @@ public class AfeAckMsgEntity {
 	@Column(name = "\"ack_Status\"", length = 8)
 	private String ackStatus;
 
-	@Column(name = "\"ack_Message\"", length = 300)
+	@Column(name = "\"ack_Msg\"", length = 300)
 	private String ackMesage;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -41,7 +41,7 @@ public class AfeAckMsgEntity {
 	private Boolean envioFlagAhAck;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "\"createTimestamp\"")
+	@Column(name = "\"create_Timestamp\"")
 	Date creationTimeStamp;
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -52,7 +52,7 @@ public class AfeAckMsgEntity {
 	private String obs;
 
 	@Column(name = "\"bstate\"")
-	private Character bstate;
+	private Integer bstate;
 
 	public AfeAckMsgEntity() {
 		super();
@@ -138,11 +138,11 @@ public class AfeAckMsgEntity {
 		this.obs = obs;
 	}
 
-	public Character getBstate() {
+	public Integer getBstate() {
 		return bstate;
 	}
 
-	public void setBstate(Character bstate) {
+	public void setBstate(Integer bstate) {
 		this.bstate = bstate;
 	}
 

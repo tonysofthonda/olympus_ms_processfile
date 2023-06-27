@@ -81,6 +81,8 @@ public class ProcessFileService {
 	private String serviceName;
 
 	private static final String DELIMITER = "/";
+	
+	private static final String DATE_FORMAT = "yyyy-MM-dd";
 
 	@Autowired
 	AfeFixedOrdersEvRepository afeFixedOrdersEvRepository;
@@ -179,6 +181,7 @@ public class ProcessFileService {
 			});
 
 		} catch (Exception e) {
+			log.error("Exception opening file due to: {} ",e.getLocalizedMessage());
 			fileprocessMessagesHandler.createAndLogMessageFileFail(fileName);
 			throw new FileProcessException("No es posible abrir el archivo: " + fileName);
 		}
@@ -334,7 +337,7 @@ public class ProcessFileService {
 		fixedOrder.setBstate(1);
 		}catch(NumberFormatException | ParseException nfe){
 			log.info("Exception inserting data due to: {} ",nfe.getLocalizedMessage());
-			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
+			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV",nfe.getLocalizedMessage());
 			return;
 		}
 		try {
@@ -343,7 +346,7 @@ public class ProcessFileService {
 			afeFixedOrdersEvRepository.save(fixedOrder);
 		} catch (Exception e) {
 			log.info("ProcessFile:: End sixth altern flow");
-			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV");
+			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV",e.getLocalizedMessage());
 			return;
 		}
 
@@ -395,7 +398,7 @@ public class ProcessFileService {
 
 			// return to main line process loop
 			log.debug("ProcessFile:: FixedOrder DOESN'T exist");
-
+             return;
 		}
 
 		Long fixedOrderIdQ9 = fixedOrders.get(0).getId();
@@ -755,9 +758,10 @@ public class ProcessFileService {
 			try {
 				strDate = templateField.get().getValue();
 
-				return new SimpleDateFormat("dd/MM/yyyy").parse(strDate);
+				return new SimpleDateFormat(DATE_FORMAT).parse(strDate);
 	
 			} catch (ParseException ep) {
+				
 				log.debug(
 						"ProcessFile::  La línea leida no cumple con los requerimientos establecidos due to:{}  date format exception for: {}",ep.getLocalizedMessage(),
 						templateField.get().getValue());

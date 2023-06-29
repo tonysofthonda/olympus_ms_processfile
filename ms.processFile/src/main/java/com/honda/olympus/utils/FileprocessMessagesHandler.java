@@ -25,7 +25,7 @@ public class FileprocessMessagesHandler {
 
 	private static final String ERROR_OPENNING_FILE = "No es posible abrir el archivo: %s";
 	private static final String LINE_FAIL = "La línea leida no cumple con los requerimientos establecidos: %s ";
-	private static final String REQUST_ID_EXISTS = "Existe el Id: %s en la tabla afedb.afe_fixed_orders_ev con el query: %s";
+	private static final String REQUST_ID_EXISTS = "Existe el requst_id: %s en la tabla afedb.afe_fixed_orders_ev con el query: %s";
 	private static final String EXTERN_REQST_ID = 	"Existe el extern_config_id: %s en la tabla AFE_FIXED_ORDERS_EV con el query: %s ";
 	private static final String ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION con el query: %s";
 	private static final String MODEL_COLOR_NO_EXISTS = "No existe el model_id: %s en la tabla AFE_MODEL_COLOR con el query: %s";

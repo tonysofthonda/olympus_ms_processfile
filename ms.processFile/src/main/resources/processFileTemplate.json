@@ -64,14 +64,14 @@
       "Description": "chrg BuSNS asct CD"
     },
     {
-      "field": "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD",
+      "field": "GM-ORD-REQ-SHIP-BUSNS-ASCT-CD",
       "Spaces": 11,
       "Position_start": 78,
       "Position_end": 88,
       "Description": "envio Busns fcn CD"
     },
     {
-      "field": "GM-ORD-REQ-CHRG-BUSNS-FCN-CD",
+      "field": "GM-ORD-REQ-SHIP-BUSNS-FCN-CD",
       "Spaces": 5,
       "Position_start": 89,
       "Position_end": 93,
@@ -79,79 +79,79 @@
     },
     {
       "field": "GM-ORD-REQ-REQST-ID",
-      "Spaces": 20,
+      "Spaces": 40,
       "Position_start": 94,
-      "Position_end": 113,
+      "Position_end": 133,
       "Description": "Order request ID"
     },
     {
       "field": "XPROD-DIV-CD",
       "Spaces": 1,
-      "Position_start": 114,
-      "Position_end": 114,
+      "Position_start": 134,
+      "Position_end": 134,
       "Description": "div cd"
     },
     {
       "field": "PLANT-ID",
       "Spaces": 1,
-      "Position_start": 115,
-      "Position_end": 115,
+      "Position_start": 135,
+      "Position_end": 135,
       "Description": "ID de planta"
     },
     {
       "field": "GM-PROD-WEEK-START-DAY",
       "Spaces": 10,
-      "Position_start": 116,
-      "Position_end": 125,
+      "Position_start": 136,
+      "Position_end": 145,
       "Description": "Dia inicio produccion"
     },
     {
       "field": "GM-ORD-DUE-DT",
       "Spaces": 10,
-      "Position_start": 126,
-      "Position_end": 135,
+      "Position_start": 146,
+      "Position_end": 155,
       "Description": "Fecha final de orden"
     },
     {
       "field": "MDL-ID",
       "Spaces": 10,
-      "Position_start": 136,
-      "Position_end": 145,
+      "Position_start": 156,
+      "Position_end": 165,
       "Description": "Model ID"
     },
     {
       "field": "MDL-TYP-CD",
       "Spaces": 4,
-      "Position_start": 146,
-      "Position_end": 149,
+      "Position_start": 166,
+      "Position_end": 169,
       "Description": "Model type ID"
     },
     {
       "field": "MDL-OPT-PKG-CD",
       "Spaces": 3,
-      "Position_start": 150,
-      "Position_end": 152,
+      "Position_start": 170,
+      "Position_end": 172,
       "Description": "PKG cd"
     },
     {
       "field": "MDL-MFG-COLOR-ID",
       "Spaces": 11,
-      "Position_start": 153,
-      "Position_end": 163,
+      "Position_start": 173,
+      "Position_end": 183,
       "Description": "Color ID"
     },
     {
       "field": "EXTR-COLOR-CD",
       "Spaces": 2,
-      "Position_start": 164,
-      "Position_end": 165,
+      "Position_start": 184,
+      "Position_end": 185,
       "Description": "Color Exterior"
     },
     {
       "field": "INT-COLOR-CD",
       "Spaces": 2,
-      "Position_start": 166,
-      "Position_end": 167,
+      "Position_start": 186,
+      "Position_end": 187,
       "Description": "Color Interior"
     }
   ]

@@ -337,16 +337,13 @@ public class ProcessFileService {
 					.setExternConfigId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-EXTERN-CONFIG-ID", fileName).trim());
 			fixedOrder.setOrderType(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-ORD-TYP-CD", fileName).trim());
 			fixedOrder.setChrgAsct(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-ASCT-CD", fileName));
-			fixedOrder.setChrgFcn(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));
-			
+			fixedOrder.setChrgFcn(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-CHRG-BUSNS-FCN-CD", fileName));	
 			fixedOrder.setShipSct(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-SHIP-BUSNS-ASCT-CD", fileName));
 			fixedOrder.setShipFcn(getLongValueOfFieldInLine(dataLine, "GM-ORD-REQ-SHIP-BUSNS-FCN-CD", fileName));
-			
 			fixedOrder.setRequestId(getStringValueOfFieldInLine(dataLine, "GM-ORD-REQ-REQST-ID", fileName).trim());
 			fixedOrder.setVinNumber("");
 			fixedOrder.setProdWeekStartDay(getDateValueOfFieldInLine(dataLine, "GM-PROD-WEEK-START-DAY", fileName));
 			fixedOrder.setOrdDueDt(getDateValueOfFieldInLine(dataLine, "GM-ORD-DUE-DT", fileName));
-
 			fixedOrder.setCreateOrdTimestamp(new Date());
 			fixedOrder.setCreationTimeStamp(new Date());
 

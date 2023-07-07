@@ -34,7 +34,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler{
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request){
 		
-		String notificationMessage = String.format( "No es posbile conectarse a la base de datos: %s User: %s", host,user);
+		String notificationMessage = String.format(ProcessFileConstants.FILE_ERROR_MESSAGE, "Unknown");
 		MessageVO message = new MessageVO(serviceName, ProcessFileConstants.ZERO_STATUS,notificationMessage , "");
 		notificationService.generatesNotification(message);
 		

@@ -10,10 +10,13 @@ import org.springframework.stereotype.Repository;
 import com.honda.olympus.dao.AfeModelColorEntity;
 
 @Repository
-public interface AfeModelColorRepository extends JpaRepository<AfeModelColorEntity, Long>{
+public interface AfeModelColorRepository extends JpaRepository<AfeModelColorEntity, Long> {
 
-	// QUERY4
-		@Query("SELECT o FROM AfeModelColorEntity o WHERE o.modelId = :modelId ")
-		List<AfeModelColorEntity> findAllByModelId(@Param("modelId") Long modelId);
-	
+	@Query("SELECT o FROM AfeModelColorEntity o WHERE o.modelId = :modelId ")
+	List<AfeModelColorEntity> findAllByModelId(@Param("modelId") Long modelId);
+
+	// QUERY5
+	@Query("SELECT o FROM AfeModelColorEntity o WHERE o.modelId = :modelId AND o.colorId = :colorId")
+	List<AfeModelColorEntity> findAllByModelIdAndColorId(@Param("modelId") Long modelId, @Param("colorId") Long colorId);
+
 }

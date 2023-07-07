@@ -15,5 +15,9 @@ public interface AfeModelTypeRepository extends JpaRepository<AfeModelTypeEntity
 	// QUERY4
 		@Query("SELECT o FROM AfeModelTypeEntity o WHERE o.id = :id ")
 		List<AfeModelTypeEntity> findAllById(@Param("id") Long id);
+		
+		//QUERY21
+		@Query("SELECT o FROM AfeModelTypeEntity o WHERE o.modelType = :modelType AND o.id = :id")
+		List<AfeModelTypeEntity> findAllByIdAndModel(@Param("modelType") String modelType,@Param("id") Long id);
 	
 }

@@ -120,7 +120,7 @@
       "Description": "Model ID"
     },
     {
-      "field": "MDL-TYP-CD",
+      "field": "MDL-TYP-ID",
       "Spaces": 4,
       "Position_start": 166,
       "Position_end": 169,

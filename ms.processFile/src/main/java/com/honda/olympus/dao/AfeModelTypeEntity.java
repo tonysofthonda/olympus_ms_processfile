@@ -20,7 +20,7 @@ public class AfeModelTypeEntity {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "modelType")
+	@Column(name = "model_type")
 	private String modelType;
 
 	@Column(name = "serie")

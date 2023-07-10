@@ -33,7 +33,7 @@ public class FileprocessMessagesHandler {
 	private static final String COLOR_NO_EXISTS = "No existe el COLOR ID: %s en la Tabla AFE_COLOR con el query: %s";
 	private static final String MODEL_NO_EXIST = "No existe el code: %s o el año %s en la tabla AFE_MODEL con el query: %s";
 	private static final String QUERY_EXECUTION_FAIL = "Fallo en la ejecución del query de inserción en la tabla AFE_FIXED_ORDERS_EV con el query: %s, Due to: %s";
-	private static final String QUERY_INSERT_HISTORY_SUCCESS = "Inserción exitosa de la línea: %s en la tabla AFE_ORDER_HISTORY ";
+	private static final String QUERY_INSERT_HISTORY_SUCCESS = "CREATE - Guardado en AFE. El archivo: \\n %s \\n Tokens: \\n %s \\n fue guardado con exito en la BD de AFE";
 	private static final String QUERY_NO_EXIST_AFE_FIXED_ORDER = "NO existe el id: %s en la tabla AFE_FIXED_ORDER_EV con el query: %s";
 	private static final String QUERY_ACTION_NO_EXISTS = "NO EXISTE la acción: %s en la tabla AFE_ACTION  con el query: %s";
 	private static final String QUERY_EVENT_STATUS_NO_EXISTS = "NO tiene status el FIXED_ORDER: %s con el query: %s";
@@ -41,6 +41,8 @@ public class FileprocessMessagesHandler {
 	private static final String QUERY_EVENT_CODE_NUM_MAJOR = "El event_code_number es mayor o igual a %s event_code_number: %s";
 	private static final String ACTION_SUCCESS = "Inserción exitosa de la línea %s en la tabla AFEfIXED_ORDER_EV y en la tabla AFE_ORDER_HISTORY";
 	private static final String ORDER_HISTORY_FAIL = "Fallo de ejecución en la tabla AFE_ORDER_HISOTRY con el query: %s";
+	private static final String UNDEFINED_OPERATION_FAIL = "La acción solicitada NO esta definida en el flujo: %s";
+	
 	
 	
 	
@@ -63,6 +65,17 @@ public class FileprocessMessagesHandler {
 
 		sendAndLog();
 	}
+	
+	public void createAndLogMessageActionNotDefinedFail(String action,String fileName) {
+
+		this.message = String.format(UNDEFINED_OPERATION_FAIL, action, fileName);
+		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, fileName);
+
+		sendAndLog();
+	}
+	
+	
+	
 
 	public void createAndLogMessageReqstExist(String requestId,String query) {
 
@@ -90,7 +103,7 @@ public class FileprocessMessagesHandler {
 		sendAndLog();
 	}
 	
-	public void createAndLogMessageModelNoExist(String action,String modelYear,String query) {
+	public void createAndLogMessageModelNoExist(String action,Long modelYear,String query) {
 
 		this.message = String.format(MODEL_NO_EXIST, action, modelYear, query);
 		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
@@ -130,9 +143,9 @@ public class FileprocessMessagesHandler {
 		sendAndLog();
 	}
 	
-	public void createAndLogMessageInsertHistorySuccess(String line) {
+	public void createAndLogMessageInsertHistorySuccess(String lineNumber,String line) {
 
-		this.message = String.format(QUERY_INSERT_HISTORY_SUCCESS, line);
+		this.message = String.format(QUERY_INSERT_HISTORY_SUCCESS,lineNumber,line);
 		this.event = new EventVO(serviceName, ProcessFileConstants.ZERO_STATUS, message, "");
 
 		sendAndLog();

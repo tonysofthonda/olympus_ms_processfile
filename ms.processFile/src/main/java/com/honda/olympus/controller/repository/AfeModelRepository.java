@@ -14,6 +14,6 @@ public interface AfeModelRepository extends JpaRepository<AfeModelEntity, Long> 
 
 	// QUERY4
 	@Query("SELECT o FROM AfeModelEntity o WHERE o.code = :code and o.modelYear = :modelYear ")
-	List<AfeModelEntity> findAllByCode(@Param("code") String code,@Param("modelYear") String modelYear);
+	List<AfeModelEntity> findAllByCode(@Param("code") String code,@Param("modelYear") Long modelYear);
 
 }

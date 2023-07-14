@@ -375,7 +375,7 @@ public class ProcessFileService {
 		try {
 			// QUERY6
 			// QUERY7
-			afeFixedOrdersEvRepository.save(fixedOrder);
+			afeFixedOrdersEvRepository.saveAndFlush(fixedOrder);
 		} catch (Exception e) {
 			log.info("ProcessFile:: End sixth altern flow");
 			fileprocessMessagesHandler.createAndLogMessageInsertFixedorderFailed("INSERT * INTO AFE_FIXED_ORDER_EV",
@@ -812,7 +812,7 @@ public class ProcessFileService {
 		Long longValue = null;
 		if (templateField.isPresent()) {
 			try {
-				longValue = Long.parseLong(templateField.get().getValue());
+				longValue = Long.parseLong(templateField.get().getValue().trim());
 				// log.info("allowed long maxvalue: " + Long.MAX_VALUE);
 			} catch (NumberFormatException e) {
 
